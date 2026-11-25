@@ -1,7 +1,7 @@
 // Each invocation owns its ray and its complete relation program.
 RaytracingAccelerationStructure scene;
 StructuredBuffer<float3> vertices;
-StructuredBuffer<uint> kinds;
+
 StructuredBuffer<int> owners;
 StructuredBuffer<float3> stations;
 StructuredBuffer<float3> directions;
@@ -15,21 +15,16 @@ float tMin;
 
 bool intersectLeg(RayDesc ray, uint kind, out uint primitive, out float distance)
 {
-    RayQuery<RAY_FLAG_FORCE_NON_OPAQUE> query;
-    query.TraceRayInline(scene, RAY_FLAG_NONE, 255, ray);
-    while (query.Proceed())
-    {
-        if (query.CandidateType() == CANDIDATE_NON_OPAQUE_TRIANGLE &&
-            kinds[query.CandidatePrimitiveIndex()] == kind)
-            query.CommitNonOpaqueTriangleHit();
-    }
+    RayQuery<RAY_FLAG_FORCE_OPAQUE> query;
+    query.TraceRayInline(scene, RAY_FLAG_NONE, 1u << kind, ray);
+    while (query.Proceed()) {}
     if (query.CommittedStatus() != COMMITTED_TRIANGLE_HIT)
     {
         primitive = 0;
         distance = 0;
         return false;
     }
-    primitive = query.CommittedPrimitiveIndex();
+    primitive = query.CommittedInstanceID() + query.CommittedPrimitiveIndex();
     distance = query.CommittedRayT();
     return true;
 }
