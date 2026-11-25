@@ -67,28 +67,28 @@ def scene_arrays(keys, votes, routing):
     owners = np.concatenate(
         (byte, 512 + np.arange(len(pair)), np.full(len(first) + len(second), -1))
     )
-    return dict(
-        params=json.dumps(
-            dict(
-                hop_mode="specular",
-                max_events=4,
-                t_min=0.001,
-                emit_offset=0.1,
-                emit_range=2.1,
-                arrival_range=1.0,
-                transport_range=512.0,
-                energy_floor=0.001,
-                transport_hits_facts=False,
-            )
+    return {
+        "params": json.dumps(
+            {
+                "hop_mode": "specular",
+                "max_events": 4,
+                "t_min": 0.001,
+                "emit_offset": 0.1,
+                "emit_range": 2.1,
+                "arrival_range": 1.0,
+                "transport_range": 512.0,
+                "energy_floor": 0.001,
+                "transport_hits_facts": False,
+            }
         ),
-        tri_vertices=triangles,
-        tri_station=owners.astype(np.int32),
-        tri_reflectance=np.ones(len(owners), np.float32),
-        tri_kind=(owners < 0).astype(np.uint32),
-        tri_displacement=np.zeros((len(owners), 3), np.float32),
-        relation_dir=dirs.astype(np.float32),
-        station_pos=np.vstack((outputs, starts, pair)).astype(np.float32),
-    )
+        "tri_vertices": triangles,
+        "tri_station": owners.astype(np.int32),
+        "tri_reflectance": np.ones(len(owners), np.float32),
+        "tri_kind": (owners < 0).astype(np.uint32),
+        "tri_displacement": np.zeros((len(owners), 3), np.float32),
+        "relation_dir": dirs.astype(np.float32),
+        "station_pos": np.vstack((outputs, starts, pair)).astype(np.float32),
+    }
 
 
 def gpu_votes(device, kernel, checkpoint, contexts):
@@ -181,15 +181,15 @@ def main():
         "finite_vote_oracle": distribution(oracle_votes, backoff),
         "exact_trigram": interpolate(exact_hist, exact_low[all_keys % 256]),
     }
-    report = dict(
-        split=args.split,
-        training_bytes=len(train),
-        scored_bytes=len(held) - 2,
-        learned_pairs=len(keys),
-        seen_pair_fraction=float(np.isin(pairs(held), keys).mean()),
-        bigram_vote_mismatches=int(np.count_nonzero(launched != low_votes)),
-        hardware={},
-    )
+    report = {
+        "split": args.split,
+        "training_bytes": len(train),
+        "scored_bytes": len(held) - 2,
+        "learned_pairs": len(keys),
+        "seen_pair_fraction": float(np.isin(pairs(held), keys).mean()),
+        "bigram_vote_mismatches": int(np.count_nonzero(launched != low_votes)),
+        "hardware": {},
+    }
     for name, routing in (
         ("two_hop", np.arange(len(keys))),
         ("shuffled", np.random.default_rng(20261125).permutation(len(keys))),
