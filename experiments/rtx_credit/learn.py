@@ -138,6 +138,26 @@ def cpu_assignment(train, route, votes, default):
     return vote_distribution(votes)[route]
 
 
+def optimize_routes(
+    optical, train, default, rng, aim, votes, route, p, rounds, scramble=None
+):
+    active = np.flatnonzero(train.sum(1))
+    changed = 0
+    for _ in range(rounds):
+        proposal = rng.uniform(-0.49, BANKS - 0.51, 256)
+        trial_route, trial_p = optical.trial(proposal, votes)
+        accept = nll(train, trial_p) < nll(train, p)
+        if scramble is not None:
+            accept[active] = scramble.permutation(accept[active])
+        aim = np.where(accept, proposal, aim)
+        changed += int(np.count_nonzero(accept & (trial_route != route)))
+        # Re-trace the accepted geometry before crediting its receivers with observations.
+        route, _ = optical.trial(aim, votes)
+        votes = bank_emissions(train, route, default)
+        route, p = optical.trial(aim, votes)
+    return aim, votes, route, p, changed
+
+
 def fit(device, kernel, train, default, seed, control, out):
     rng = np.random.default_rng(seed)
     scramble = np.random.default_rng(seed + 700)
@@ -156,19 +176,18 @@ def fit(device, kernel, train, default, seed, control, out):
         else None
     )
     initial_loss = float(nll(train, p).sum() / train.sum())
-    changed = 0
-    for _ in range(ROUNDS):
-        proposal = rng.uniform(-0.49, BANKS - 0.51, 256)
-        trial_route, trial_p = optical.trial(proposal, votes)
-        accept = nll(train, trial_p) < nll(train, p)
-        if control == "shuffled_credit":
-            accept[active] = scramble.permutation(accept[active])
-        aim = np.where(accept, proposal, aim)
-        changed += int(np.count_nonzero(accept & (trial_route != route)))
-        # Re-trace the accepted geometry before crediting its receivers with observations.
-        route, _ = optical.trial(aim, votes)
-        votes = bank_emissions(train, route, default)
-        route, p = optical.trial(aim, votes)
+    aim, votes, route, p, changed = optimize_routes(
+        optical,
+        train,
+        default,
+        rng,
+        aim,
+        votes,
+        route,
+        p,
+        ROUNDS,
+        scramble if control == "shuffled_credit" else None,
+    )
     ckpt = out / f"{control}-{seed}.npz"
     np.savez(ckpt, **make_scene(aim, votes))
     with np.load(ckpt, allow_pickle=False) as data:
