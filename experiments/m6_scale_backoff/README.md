@@ -36,6 +36,6 @@ Parity is exact at every size: RTX dish hits = CPU suffix contexts; RTX bpb = Nu
   CPU fold takes 0.10–0.11 s against 0.16–0.19 s for full NumPy KN scoring (single-threaded NumPy,
   1.6–1.8× faster). That margin is modest and would shrink against an optimised multi-threaded CPU
   index, so no general speed advantage is claimed.
-- Memory grows linearly with distinct contexts; acceleration structures cost ~2.7× the vertex bytes.
+- Memory grows linearly with distinct contexts; acceleration structures cost 1.8–2.0× the vertex bytes.
 - Next steps (not in this PR): persistent device buffers, and the GPU payload fold from #41, which
   should remove both host costs.
