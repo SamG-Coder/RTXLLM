@@ -1,11 +1,13 @@
-"""Exercise train/update/generate as separate processes on an RTX adapter."""
+"""Exercise train/update/score/generate as separate processes on an RTX adapter."""
 
 import hashlib
+import itertools
 import json
 import shutil
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from pathlib import Path
 
 import numpy as np
@@ -31,6 +33,41 @@ def invoke(*args, expect_error=False):
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def verify_score(scene, files):
+    import byte_model
+
+    report = json.loads(invoke("score", scene, *files).splitlines()[-1])
+    transitions = Counter()
+    total_bytes = 0
+    for file in files:
+        raw = file.read_bytes()
+        total_bytes += len(raw)
+        transitions.update(itertools.pairwise(raw))
+    assert report["input_bytes"] == total_bytes
+    assert report["scored_bytes"] == transitions.total()
+    assert report["files"] == len(files)
+    learn = byte_model.learn
+    device, kernel = learn.bigram.open_kernel()
+    geometry = learn.bigram.SpecularScene(device, byte_model.read_geometry(scene))
+    programs = np.column_stack(
+        (np.full(learn.N, learn.N, np.int32), np.arange(learn.N, dtype=np.int32))
+    )
+    bits = 0.0
+    for prev in sorted({a for a, _ in transitions}):
+        paths, _ = geometry.trace(
+            kernel,
+            {
+                "start": np.full(learn.N, 256 + prev, np.int32),
+                "program": programs,
+            },
+        )
+        p = learn.vote_distribution(paths[:, 1][None, :])[0]
+        bits -= sum(n * np.log2(p[b]) for (a, b), n in transitions.items() if a == prev)
+    np.testing.assert_allclose(
+        report["bits_per_byte"], bits / transitions.total(), atol=1e-12, rtol=0
+    )
 
 
 def main():
@@ -103,6 +140,12 @@ def main():
         assert "FileExistsError" in invoke("train", second, initial, expect_error=True)
         empty = root / "empty"
         empty.write_bytes(b"")
+        single = root / "single"
+        single.write_bytes(b"!")
+        verify_score(scene, [empty, first, single, second])
+        assert "two or more bytes" in invoke(
+            "score", scene, empty, single, expect_error=True
+        )
         assert "at least one byte" in invoke(
             "train", empty, root / "failed", expect_error=True
         )
@@ -115,7 +158,7 @@ def main():
         )
         assert not (root / "failed").exists()
         print(
-            "Verified chunking, both update boundary modes, stable identities, geometry-only sampling and publication failures"
+            "Verified chunking, both update boundary modes, stable identities, geometry-only scoring and sampling and publication failures"
         )
 
 

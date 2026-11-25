@@ -15,7 +15,7 @@ sys.path.insert(
 import learn
 
 
-def ingest(path, counts, frequencies, preceding=None):
+def ingest(path, counts, frequencies, preceding=None, *, allow_empty=False):
     length = 0
     with path.open("rb") as source:
         while raw := source.read(1024 * 1024):
@@ -27,7 +27,7 @@ def ingest(path, counts, frequencies, preceding=None):
             counts += np.bincount(keys, minlength=65536).reshape(256, 256)
             preceding = int(data[-1])
             length += len(data)
-    if not length:
+    if not length and not allow_empty:
         raise ValueError("Input must contain at least one byte")
     return length, preceding
 
@@ -161,6 +161,31 @@ def sample_bytes(device, kernel, scene, previous, count, rng):
     return generated
 
 
+def score(args):
+    counts = np.zeros((256, 256), np.int64)
+    frequency = np.zeros(256, np.int64)
+    for path in args.files:
+        ingest(path, counts, frequency, allow_empty=True)
+    targets = int(counts.sum())
+    if not targets:
+        raise ValueError("Scoring needs at least one file with two or more bytes")
+    device, kernel = learn.bigram.open_kernel()
+    optical = learn.OpticalTrainer(device, kernel, read_geometry(args.scene))
+    _, probabilities = optical.read()
+    print(
+        json.dumps(
+            {
+                "files": len(args.files),
+                "input_bytes": int(frequency.sum()),
+                "scored_bytes": targets,
+                "bits_per_byte": float(
+                    learn.nll(counts, probabilities).sum() / targets
+                ),
+            }
+        )
+    )
+
+
 def generate(args):
     stream = bytearray(args.prompt.encode("utf-8"))
     if not stream:
@@ -212,8 +237,17 @@ def main():
     sample.add_argument(
         "--out", type=Path, help="Write the prompt and sampled raw bytes to a new file"
     )
+    evaluate = commands.add_parser(
+        "score", help="Score raw files with a saved RTX scene"
+    )
+    evaluate.add_argument("scene", type=Path)
+    evaluate.add_argument(
+        "files", type=Path, nargs="+", help="Independent byte streams"
+    )
     args = parser.parse_args()
-    if args.command == "generate":
+    if args.command == "score":
+        score(args)
+    elif args.command == "generate":
         if args.count < 0:
             parser.error("--count must be nonnegative")
         generate(args)

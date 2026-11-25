@@ -1,0 +1,23 @@
+{
+  "book": "time-35",
+  "device": "NVIDIA GeForce RTX 5080",
+  "scored_bytes": 184725,
+  "rays": 6320734,
+  "unigram_bpb": 4.550291838630151,
+  "bigram_bpb": 3.4697959634729405,
+  "one": {
+    "bpb": 3.664233447778007,
+    "coverage": 0.9753796183516037,
+    "successor_accuracy_on_matches": 0.1692946380503616
+  },
+  "multi": {
+    "bpb": 3.400680490102112,
+    "coverage": 0.6195263229124374,
+    "successor_accuracy_on_matches": 0.31843204417958443
+  },
+  "passes": true,
+  "as_build_wall_ms": 2.473400003509596,
+  "as_bytes": 11158400,
+  "resident_scratch_bytes": 742016,
+  "dispatch_and_readback_s": 0.023600300002726726
+}
