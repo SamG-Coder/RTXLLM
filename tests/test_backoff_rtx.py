@@ -41,3 +41,25 @@ def test_order_limit():
     device, _ = backoff.open_backoff_kernel()
     with pytest.raises(ValueError):
         backoff.LayeredScene(device, KneserNey(7).fit([TEXT]))
+
+
+def test_oldest_high_byte_selects_distinct_dishes_and_unseen_reaches_suffix():
+    """Codex's #32 requests: (1) two order-6 histories differing only in a high-bit
+    oldest byte hit distinct full-context dishes; (2) an unseen top-order context
+    still reaches its seen suffix dish from the query bytes alone."""
+    backoff = _rtx()
+    device, kernel = backoff.open_backoff_kernel()
+    a = bytes([0x80]) + b"abcd" + b"x"
+    b_ = bytes([0xFF]) + b"abcd" + b"y"
+    train = np.frombuffer((a + b" " + b_ + b" ") * 3, np.uint8).astype(np.int64)
+    kn = KneserNey(6).fit([train])
+    sc = backoff.LayeredScene(device, kn)
+    q = np.frombuffer(a + b_ + bytes([0x81]) + b"abcd" + b"z", np.uint8).astype(np.int64)
+    idx = np.array([5, 11, 17])              # targets x, y, z with 5-byte contexts
+    d, _ = sc.trace(kernel, sc.points(q, idx))
+    assert np.array_equal(d, sc.expected_dishes(q, idx))
+    assert d[0, 0] >= 0 and d[1, 0] >= 0 and d[0, 0] != d[1, 0]     # distinct primitives
+    assert d[2, 0] == -1                      # context 0x81 'abcd' never seen ...
+    assert d[2, 1] >= 0 and d[2, 1] == d[0, 1] == d[1, 1]           # ... but 'abcd' is reached
+    p = sc.target_prob(d, q[idx])
+    assert np.allclose(p, kn.prob(q, start=0)[idx], atol=1e-12)
