@@ -1,5 +1,7 @@
 # Word generation from persistent emission geometry
 
+**Traversal (T).** The learned layout and the first beam determine which neighbours contribute evidence. **Addressed storage (S).** The second stage reads a probability from an integer row and column. Its ray recovers the value encoded at that location.
+
 The archive contains the E12 word dishes, launch positions and radii, the vocabulary and dish identities, plus a second scene of probability triangles. It is sufficient to score a document or generate a sequence in a fresh process. Every inference-time probability comes from triangle intersections and their weighted sum.
 
 The first acceleration structure finds neighbouring word dishes with the 512-ray E12 annulus. On load, the host groups hits by dish identity and combines their Gaussian weights. This is exact because rays hitting the same dish lead to the same emission row. The GPU retains this list for each word. When scoring a candidate, each retained hit selects a row in the emission scene. The next ray's column selects the candidate word, and its hit distance gives the conditional probability mass. A missing triangle contributes zero. Other rows in the same scene encode discounted bigram mass, backoff weight and continuation unigram. The shader combines that prior with the weighted neighbour emissions. The model uses two dependent intersection stages with a cached first stage and spatially addressed ray launches. The final sampler draws from the returned vocabulary distribution on the CPU.
