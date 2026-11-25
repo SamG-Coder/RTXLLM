@@ -43,6 +43,7 @@ class GeometryConfig:
     fact_distance: float = 1.5    # distance of first fact quad from its station along d_r
     stack_gap: float = 0.5        # spacing of stacked (multi-valued) quads
     relation_seed: int = 12345
+    dish_radius: float = 0.0      # >0: fact is a focusing (Fresnel) dish of facets covering this radius
 
 
 @dataclass
@@ -55,9 +56,14 @@ class Scene:
     station_pos: np.ndarray       # f32 [S,3]
     relation_dir: np.ndarray      # f32 [R,3] unit
     params: TraceParams = field(default_factory=TraceParams)
+    tri_relation: np.ndarray = None  # i32 [T] relation channel of a fact (-1 receivers); ADR 0002
 
     ARRAYS = ("tri_vertices", "tri_kind", "tri_station", "tri_reflectance",
-              "tri_displacement", "station_pos", "relation_dir")
+              "tri_displacement", "station_pos", "relation_dir", "tri_relation")
+
+    def __post_init__(self):
+        if self.tri_relation is None:
+            self.tri_relation = np.full(len(self.tri_kind), -1, np.int32)
 
     def save(self, path):
         np.savez(path, params=json.dumps(asdict(self.params)),
@@ -66,7 +72,8 @@ class Scene:
     @classmethod
     def load(cls, path):
         z = np.load(path, allow_pickle=False)
-        return cls(**{k: z[k] for k in cls.ARRAYS}, params=TraceParams(**json.loads(str(z["params"]))))
+        return cls(**{k: z[k] for k in cls.ARRAYS if k in z.files},
+                   params=TraceParams(**json.loads(str(z["params"]))))
 
     def with_params(self, **kw):
         return replace(self, params=replace(self.params, **kw))
@@ -121,6 +128,66 @@ def _fact_triangle(center, normal, radius):
     return np.array([center + radius * (np.cos(x) * t1 + np.sin(x) * t2) for x in ang])
 
 
+def _dish_centroids(radius, facet_radius):
+    """Centroids (2D) of a triangular tiling whose central triangle is centred on
+    the origin, clipped to a disk. The pencil ray through the origin therefore
+    hits a facet centroid, never an edge."""
+    a = facet_radius * 3 ** 0.5          # side of an equilateral triangle
+    e1, e2 = np.array([a, 0.0]), np.array([a / 2, a * 3 ** 0.5 / 2])
+    shift = (e1 + e2) / 3.0
+    n = int(np.ceil(radius / a)) + 2
+    cs = []
+    for i in range(-n, n + 1):
+        for j in range(-n, n + 1):
+            b = i * e1 + j * e2
+            for c in (b + (e1 + e2) / 3.0, b + 2 * (e1 + e2) / 3.0):
+                c = c - shift
+                if np.hypot(*c) <= radius:
+                    cs.append(c)
+    cs.sort(key=lambda c: (np.hypot(*c), c[0], c[1]))
+    return np.asarray(cs)
+
+
+def _fact_triangles(centers, normals, radius):
+    """Vectorised :func:`_fact_triangle` for [n,3] centres and normals."""
+    a = np.where((np.abs(normals[:, 0]) < 0.9)[:, None], [1.0, 0, 0], [0, 1.0, 0])
+    t1 = np.cross(normals, a)
+    t1 /= np.linalg.norm(t1, axis=1, keepdims=True)
+    t2 = np.cross(normals, t1)
+    ang = np.array([0.0, 2.0, 4.0]) * np.pi / 3.0
+    return centers[:, None, :] + radius * (np.cos(ang)[None, :, None] * t1[:, None, :]
+                                           + np.sin(ang)[None, :, None] * t2[:, None, :])
+
+
+_DISH_CACHE = {}
+
+
+def _focusing_dish(m, d, target, radius, facet_radius):
+    """Facets laid out on a disk perpendicular to d, lifted (along d) onto the plane
+    through m normal to the mean bisector; each facet's normal reflects d from its
+    own centroid onto ``target``. Returns [n_facets, 3, 3]."""
+    key = (radius, facet_radius)
+    if key not in _DISH_CACHE:
+        _DISH_CACHE[key] = _dish_centroids(radius, facet_radius)
+    c2 = _DISH_CACHE[key]
+    u0 = target - m
+    u0 /= np.linalg.norm(u0)
+    n0 = u0 - d
+    n0 = n0 / np.linalg.norm(n0) if np.linalg.norm(n0) > 1e-9 else np.cross(d, [0.0, 0.0, 1.0])
+    a = np.array([1.0, 0, 0]) if abs(d[0]) < 0.9 else np.array([0, 1.0, 0])
+    t1 = np.cross(d, a)
+    t1 /= np.linalg.norm(t1)
+    t2 = np.cross(d, t1)
+    c = m + c2[:, :1] * t1 + c2[:, 1:] * t2
+    c = c - d * (((c - m) @ n0) / np.dot(d, n0))[:, None]
+    u = target - c
+    u /= np.linalg.norm(u, axis=1, keepdims=True)
+    n = u - d
+    nn = np.linalg.norm(n, axis=1, keepdims=True)
+    n = np.where(nn > 1e-9, n / np.maximum(nn, 1e-30), n0)
+    return _fact_triangles(c, n, facet_radius)
+
+
 def build_scene(world, geom: GeometryConfig = GeometryConfig(), params: TraceParams = TraceParams()):
     """Write the world's atomic facts into geometry.
 
@@ -131,7 +198,7 @@ def build_scene(world, geom: GeometryConfig = GeometryConfig(), params: TracePar
     pos = world.positions.astype(np.float64)
     rel = relation_directions(world.config.n_relations, geom.relation_seed).astype(np.float64)
     iv, ifc = icosphere(geom.receiver_radius)
-    tris, kind, station, refl, disp = [], [], [], [], []
+    tris, kind, station, refl, disp, trel = [], [], [], [], [], []
 
     for s, p in enumerate(pos):
         for f in ifc:
@@ -140,6 +207,7 @@ def build_scene(world, geom: GeometryConfig = GeometryConfig(), params: TracePar
             station.append(s)
             refl.append(0.0)
             disp.append(np.zeros(3))
+            trel.append(-1)
 
     for (s, r), objs in sorted(world.facts.items()):
         d = rel[r]
@@ -160,11 +228,17 @@ def build_scene(world, geom: GeometryConfig = GeometryConfig(), params: TracePar
                 dv = land - m
             else:
                 raise ValueError(params.hop_mode)
-            tris.append(_fact_triangle(m, n, geom.fact_radius))
-            kind.append(KIND_FACT)
-            station.append(-1)
-            refl.append(R)
-            disp.append(dv)
+            if geom.dish_radius > 0 and params.hop_mode == SPECULAR:
+                facets = _focusing_dish(m, d, pos[o], geom.dish_radius, geom.fact_radius)
+            else:
+                facets = [_fact_triangle(m, n, geom.fact_radius)]
+            for tri in facets:
+                tris.append(tri)
+                kind.append(KIND_FACT)
+                station.append(-1)
+                refl.append(R)
+                disp.append(dv)
+                trel.append(r)
 
     params = replace(params,
                      emit_offset=float(1.5 * geom.receiver_radius),
@@ -179,6 +253,7 @@ def build_scene(world, geom: GeometryConfig = GeometryConfig(), params: TracePar
         station_pos=world.positions.astype(np.float32),
         relation_dir=rel.astype(np.float32),
         params=params,
+        tri_relation=np.asarray(trel, np.int32),
     )
 
 
