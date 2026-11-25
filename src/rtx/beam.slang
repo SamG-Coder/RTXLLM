@@ -10,6 +10,7 @@ StructuredBuffer<int> owners;         // [T] receiver station, sorted order
 StructuredBuffer<int> beamStation;    // [nb]
 StructuredBuffer<int> beamRelation;   // [nb]
 RWStructuredBuffer<int> landing;      // [nb * raysPerBeam]
+RWStructuredBuffer<int> hitTri;       // [nb * raysPerBeam] sorted index of the emission hit, -1 none
 uint beamCount, raysPerBeam;
 float span, reach, transportRange, tMin;
 
@@ -48,10 +49,12 @@ void trace(uint3 tid : SV_DispatchThreadID)
     float3 d = directions[r];
     float3 o = (stations[beamStation[b]] - span * d) + offsets[r * raysPerBeam + k];
     int result = -1;
+    int emitted = -1;
     uint tri;
     float t;
     if (closest(o, d, reach, 1u << (1 + r), tri, t))
     {
+        emitted = int(tri);
         result = -2;  // reflected; overwritten if a receiver is reached
         float3 p = o + t * d;
         float3 n = normals[tri];
@@ -61,4 +64,5 @@ void trace(uint3 tid : SV_DispatchThreadID)
             result = owners[tri];
     }
     landing[i] = result;
+    hitTri[i] = emitted;
 }
