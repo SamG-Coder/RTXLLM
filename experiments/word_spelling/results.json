@@ -1,0 +1,53 @@
+{
+  "triangles": 1593,
+  "as_bytes": 104704,
+  "remaining": {
+    "character": 0.9274311319069842,
+    "shared": 0.9365713880475105
+  },
+  "books": {
+    "holmes-1661": {
+      "targets": 128961,
+      "unknown_tokens": 20718,
+      "unknown_token_bytes": 106622,
+      "character": {
+        "spelling_bits_per_unknown_byte": 4.622948951431052,
+        "open_bits_per_token": 10.806300924682157
+      },
+      "shared": {
+        "spelling_bits_per_unknown_byte": 5.164423233844228,
+        "open_bits_per_token": 11.253979454931285
+      },
+      "gain_bits_per_unknown_byte": 0.5414742824131755
+    },
+    "war-36": {
+      "targets": 73964,
+      "unknown_tokens": 14210,
+      "unknown_token_bytes": 90943,
+      "character": {
+        "spelling_bits_per_unknown_byte": 4.221405201638182,
+        "open_bits_per_token": 12.061131623657364
+      },
+      "shared": {
+        "spelling_bits_per_unknown_byte": 4.848309607789095,
+        "open_bits_per_token": 12.83194671489881
+      },
+      "gain_bits_per_unknown_byte": 0.6269044061509135
+    },
+    "moby-2701": {
+      "targets": 281050,
+      "unknown_tokens": 62587,
+      "unknown_token_bytes": 371942,
+      "character": {
+        "spelling_bits_per_unknown_byte": 4.378781847183866,
+        "open_bits_per_token": 12.705583234590279
+      },
+      "shared": {
+        "spelling_bits_per_unknown_byte": 4.959562380314512,
+        "open_bits_per_token": 13.474189080716158
+      },
+      "gain_bits_per_unknown_byte": 0.5807805331306461
+    }
+  },
+  "passes": true
+}
