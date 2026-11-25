@@ -1,6 +1,6 @@
 """Layered transmission geometry for physical backoff (issue #23), analytic form.
 
-Geometry (realised as triangles for RTX in ``rtxllm.core.byte_scene``):
+Geometry (analytic evaluator; no RTX realisation in this module):
 
 * Each byte value b owns a cell ``g(b) = (gx, gy)`` of a 16x16 grid.
 * A context of the last m bytes ``c = (b_{t-m} .. b_{t-1})`` owns the square
@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from rtxllm.baselines.ngram import B, KneserNey
+from rtxllm.baselines.ngram import B, BU, U, KneserNey, _find
 
 G = 16
 
@@ -81,32 +81,34 @@ class LayeredBackoff:
         return p + np.array([0.5, 0.25]) * float(G) ** -self.k
 
     def cell_context(self, pts, m):
-        """int64 context key (last m bytes, oldest first) whose layer-m dish
-        contains each point, or -1 outside [0, 1)^2."""
+        """(uint64 key of the last-m-byte context, oldest byte first, whose layer-m
+        dish contains each point; inside mask for the unit square)."""
         inside = np.all((pts >= 0) & (pts < 1), axis=1)
         q = np.clip(pts, 0, 1 - 1e-12)
-        key = np.zeros(len(pts), np.int64)
+        key = np.zeros(len(pts), U)
         digits = []
         for j in range(1, m + 1):
             cell = np.floor(q * float(G) ** j).astype(np.int64) % G
-            digits.append(self.cell_to_byte[cell[:, 0], cell[:, 1]])
+            digits.append(self.cell_to_byte[cell[:, 0], cell[:, 1]].astype(U))
         for b in reversed(digits):            # oldest byte (largest j) first
-            key = key * B + b
-        return np.where(inside, key, -1)
+            key = key * BU + b
+        return key, inside
 
     def target_prob(self, pts, targets):
         """P(target) for rays at ``pts`` (one ray per row)."""
         p = np.full(len(pts), 1.0 / B)
         for m in range(0, self.k + 1):        # transmission chain, coarse to fine in recursion order
             t = self.kn.tables[m + 1]
-            ctx = self.cell_context(pts, m)
-            gram = ctx * B + targets
-            ci = np.minimum(np.searchsorted(t["cu"], ctx), len(t["cu"]) - 1)
-            seen = (ctx >= 0) & (t["cu"][ci] == ctx)
+            if not len(t["cu"]):
+                continue
+            ctx, inside = self.cell_context(pts, m)
+            gram = ctx * BU + np.asarray(targets).astype(U)
+            ci, present = _find(t["cu"], ctx)
+            seen = inside & present
             tot = np.where(seen, t["tot"][ci], 1.0)
-            gi = np.minimum(np.searchsorted(t["gk"], gram), len(t["gk"]) - 1)
-            c = np.where(seen & (t["gk"][gi] == gram), t["gc"][gi], 0).astype(np.float64)
-            D = t["D"][np.minimum(c, 3).astype(int)]
+            gi, gpres = _find(t["gk"], gram)
+            c = np.where(seen & gpres, t["gc"][gi] if len(t["gk"]) else 0, 0).astype(np.float64)
+            D = t["D"][np.minimum(c, 3).astype(np.int64)]
             gamma = (t["D"][1] * t["N1"][ci] + t["D"][2] * t["N2"][ci] + t["D"][3] * t["N3"][ci]) / tot
             p = np.where(seen, np.maximum(c - D, 0) / tot + gamma * p, p)
         return p

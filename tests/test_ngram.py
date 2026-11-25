@@ -66,3 +66,27 @@ def test_query_points_strictly_inside_cells():
         assert np.all(frac > 0) and np.all(frac < 1)
         if m == 3:
             assert np.all(np.abs(frac[:, 0] - frac[:, 1]) > 0)   # never on the triangle diagonal
+
+
+def test_order8_high_bytes_parity_regression():
+    """Codex's #28 case: signed keys sign-extended high-byte contexts at order 8."""
+    from rtxllm.learning.byte_layers import LayeredBackoff, identity_grid
+    rng = np.random.default_rng(43)
+    a = rng.integers(0, 128, 100)
+    b = rng.integers(0, 256, 100)
+    data = np.concatenate([a, np.tile(b, 5)]).astype(np.int64)
+    kn = KneserNey(8).fit([data])
+    ref = kn.prob(data, start=7)
+    _, p = LayeredBackoff(kn, identity_grid()).beam_bits(data, 7, np.zeros((1, 2)), np.ones(1))
+    assert np.allclose(p, ref, rtol=0, atol=1e-12)
+    ctx = bytes([255, 200, 129, 128, 250, 3, 255])
+    tot = sum(kn.prob(np.frombuffer(ctx + bytes([x]), np.uint8).astype(np.int64), start=7)[0] for x in range(256))
+    assert abs(tot - 1) < 1e-9
+
+
+def test_documents_shorter_than_order():
+    docs = [np.frombuffer(s, np.uint8).astype(np.int64) for s in (b"abc", b"xyz", b"abd")]
+    kn = KneserNey(4).fit(docs)
+    p = kn.prob(np.frombuffer(b"abcz", np.uint8).astype(np.int64), start=3)
+    tot = sum(kn.prob(np.frombuffer(b"abc" + bytes([x]), np.uint8).astype(np.int64), start=3)[0] for x in range(256))
+    assert np.isfinite(p).all() and abs(tot - 1) < 1e-9
