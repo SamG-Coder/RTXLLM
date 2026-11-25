@@ -25,9 +25,9 @@ BOOKS = {
 }
 
 
-def book(folder, name):
+def book(folder, name, digest=None):
     raw = (folder / f"rtxllm-{name}.txt").read_bytes()
-    if hashlib.sha256(raw).hexdigest() != BOOKS[name]:
+    if hashlib.sha256(raw).hexdigest() != (digest or BOOKS[name]):
         raise ValueError(f"Digest mismatch for {name}")
     body = re.search(
         rb"(?ms)^\*\*\* START OF.*?\*\*\*[^\S\n]*\n(.*?)^\*\*\* END OF", raw
