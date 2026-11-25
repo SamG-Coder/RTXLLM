@@ -3,6 +3,7 @@ StructuredBuffer<float3> origins;
 StructuredBuffer<float3> vertices;
 RWStructuredBuffer<int3> paths;
 uint count;
+uint maxHits;
 float3 incident;
 float firstRange;
 
@@ -18,7 +19,7 @@ void trace(uint3 tid : SV_DispatchThreadID)
     r.TMin = 0.001;
     r.TMax = firstRange;
     int3 path = int3(-1, -1, -1);
-    for (uint depth = 0; depth < 3; ++depth) {
+    for (uint depth = 0; depth < min(3u, maxHits); ++depth) {
         RayQuery<RAY_FLAG_FORCE_OPAQUE> q;
         q.TraceRayInline(scene, RAY_FLAG_NONE, 0xff, r);
         while (q.Proceed()) {}

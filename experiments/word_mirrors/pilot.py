@@ -89,6 +89,7 @@ def trace(device, kernel, scene, origins):
             vertices=gpu.vbuf,
             paths=output,
             count=len(origins),
+            maxHits=3,
             incident=sp.float3(*D),
             firstRange=FIRST_RANGE,
         ),
