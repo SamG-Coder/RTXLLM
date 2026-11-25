@@ -25,10 +25,20 @@ from time import perf_counter
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
-for p in (ROOT / "src", ROOT / "src" / "rtx", ROOT / "experiments" / "episodic"):
+for p in (ROOT / "src", ROOT / "src" / "rtx", ROOT / "experiments" / "optical_cavity"):
     sys.path.insert(0, str(p))
-from run import TriangleScene, geometry, gpu_buffer, open_kernel  # noqa: E402
-from online import TILT  # noqa: E402
+from optics import TriangleScene, mesh, open_kernel  # noqa: E402
+from run_specular import gpu_buffer  # noqa: E402
+
+# Same scene construction as experiments/episodic (run.geometry, online.TILT); copied to
+# avoid importing another module named `run`.
+TILT = np.array([(-0.3, 0.3, -0.3), (0.3, -0.3, -0.3), (0, 0, 0.3)], np.float32)
+
+
+def geometry(centers, offsets):
+    vertices = (centers[:, None] + np.asarray(offsets, np.float32)).astype(np.float32)
+    zeros = np.zeros(len(vertices), np.int32)
+    return mesh(vertices, zeros, zeros, np.array([[1, 0, 0]]))
 
 import slangpy as sp  # noqa: E402
 
