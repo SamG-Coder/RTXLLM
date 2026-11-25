@@ -39,3 +39,18 @@ Invoke-WebRequest https://raw.githubusercontent.com/GITenberg/Dracula_345/5216d6
 ```
 
 The first command after download checks the corpus digest and fits only the training prefix. The test command reloads both saved models. The generation command requires only the geometry checkpoint.
+
+## Exploratory readout-budget control
+
+A subsequent validation-only diagnostic capped learned readout geometry at 23,320 triangles, including unigram and byte backoff. It estimated each conditional row's loss reduction per triangle on the final tenth of the training observations using frequencies fitted on the first nine tenths, kept positive-benefit rows under the cap, and wrote their strip widths from the full training counts. The independent validation split supplied the scores. Both models used their original reflector and incidence directions.
+
+| Returns | Conditional rows kept | Readout triangles | Written-row coverage on validation | Validation bits/byte |
+|---|---:|---:|---:|---:|
+| 1 | 737 | 19,382 | 96.40% | 2.8225 |
+| 7 | 1,147 | 23,320 | 53.85% | 2.9442 |
+
+Under this allocation rule, the seven-return advantage disappeared. Pruning complete rows sharply reduced coverage for the more fragmented seven-return representation. At the same cap, the original unpruned one-return configuration scored 2.8162. This experiment does not rule out a better allocation rule. Its models were evaluated on validation only and left the preregistered test checkpoints untouched.
+
+```powershell
+& $python -B experiments/conditioned_cavity/check_budget.py $book $out
+```
