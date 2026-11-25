@@ -1,0 +1,62 @@
+{
+  "books": {
+    "holmes-1661": {
+      "targets": 128961,
+      "unknown_targets": 20718,
+      "unknown_bytes": 106622,
+      "base_bits_per_token": 10.806300924682159,
+      "base_spelling_bits_per_byte": 4.622948951431053,
+      "recent": {
+        "coverage": 0.3674099816584612,
+        "bits_per_token": 10.141411398738326,
+        "spelling_bits_per_byte": 3.818754524809508,
+        "gain_bits_per_token": 0.6648895259438308
+      },
+      "remote": {
+        "coverage": 0.29626411815812337,
+        "bits_per_token": 10.370779418605045,
+        "spelling_bits_per_byte": 4.096178782561491,
+        "gain_bits_per_token": 0.43552150607711215
+      }
+    },
+    "war-36": {
+      "targets": 73964,
+      "unknown_targets": 14210,
+      "unknown_bytes": 90943,
+      "base_bits_per_token": 12.061131623657364,
+      "base_spelling_bits_per_byte": 4.221405201638182,
+      "recent": {
+        "coverage": 0.19415904292751585,
+        "bits_per_token": 11.55232667877311,
+        "spelling_bits_per_byte": 3.8075938149078237,
+        "gain_bits_per_token": 0.5088049448842532
+      },
+      "remote": {
+        "coverage": 0.09535538353272344,
+        "bits_per_token": 11.87657977028703,
+        "spelling_bits_per_byte": 4.071309061388977,
+        "gain_bits_per_token": 0.18455185337033395
+      }
+    },
+    "moby-2701": {
+      "targets": 281050,
+      "unknown_targets": 62587,
+      "unknown_bytes": 371942,
+      "base_bits_per_token": 12.70558323459028,
+      "base_spelling_bits_per_byte": 4.378781847183867,
+      "recent": {
+        "coverage": 0.23533641171489286,
+        "bits_per_token": 12.0316095127974,
+        "spelling_bits_per_byte": 3.869508050436285,
+        "gain_bits_per_token": 0.6739737217928806
+      },
+      "remote": {
+        "coverage": 0.1281096713374982,
+        "bits_per_token": 12.455412690678406,
+        "spelling_bits_per_byte": 4.189745837896311,
+        "gain_bits_per_token": 0.25017054391187415
+      }
+    }
+  },
+  "passes": true
+}
