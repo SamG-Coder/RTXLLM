@@ -128,26 +128,55 @@ def train(args):
     )
 
 
+def sample_bytes(device, kernel, scene, previous, count, rng):
+    import slangpy as sp
+
+    if scene.station_count != 520 or scene.relation_count != 33:
+        raise ValueError("Expected a shared eight-bank RTX byte checkpoint")
+    generated = bytearray()
+    for begin in range(0, count, 256):
+        length = min(count - begin, 256)
+        # One uniform draw per byte matches the reference's seeded choice().
+        draws = (rng.random(length) * 25600).astype(np.uint32)
+        output = device.create_buffer(
+            data=np.full(length, -1, np.int32), usage=sp.BufferUsage.unordered_access
+        )
+        kernel.dispatch(
+            thread_count=[32, 1, 1],
+            vars={
+                **scene.bindings,
+                "draws": device.create_buffer(
+                    data=draws, usage=sp.BufferUsage.shader_resource
+                ),
+                "sampled": output,
+                "count": length,
+                "startByte": previous,
+            },
+        )
+        tokens = output.to_numpy().view(np.int32)
+        if np.any(tokens < 0):
+            raise ValueError("A generation ray failed to reach its receiver")
+        generated.extend(tokens.astype(np.uint8).tobytes())
+        previous = int(tokens[-1])
+    return generated
+
+
 def generate(args):
     stream = bytearray(args.prompt.encode("utf-8"))
     if not stream:
         raise ValueError("Prompt must contain a byte")
-    device, kernel = learn.bigram.open_kernel()
+    device, kernel = learn.bigram.open_kernel("generate.slang")
     scene = learn.bigram.SpecularScene(device, read_geometry(args.scene))
-    rng = np.random.default_rng(args.seed)
-    programs = np.column_stack(
-        (np.full(learn.N, learn.N, np.int32), np.arange(learn.N, dtype=np.int32))
-    )
-    for _ in range(args.count):
-        paths, _ = scene.trace(
+    stream.extend(
+        sample_bytes(
+            device,
             kernel,
-            {
-                "start": np.full(learn.N, 256 + stream[-1], np.int32),
-                "program": programs,
-            },
+            scene,
+            stream[-1],
+            args.count,
+            np.random.default_rng(args.seed),
         )
-        p = learn.vote_distribution(paths[:, 1][None, :])[0]
-        stream.append(int(rng.choice(256, p=p)))
+    )
     if args.out is None:
         print(repr(bytes(stream)))
     else:
