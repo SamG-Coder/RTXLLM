@@ -125,3 +125,20 @@ def test_annular_beam_never_hits_own_dish(world):
     keys = sorted(world.written)[:40]
     r = bt.trace([s for s, _ in keys], [(x,) for _, x in keys], record=True)
     assert np.allclose(r.answer.sum(1) + r.lost, 1.0, atol=1e-5)
+    # Codex's #48 request: count actual own-dish hits of the halo rays (must be zero).
+    from rtxllm.cpu.tracer import mt_closest
+    n_rec = int((scene.tri_kind != KIND_FACT).sum())
+    F = (scene.n_triangles - n_rec) // len(world.written)
+    order = sorted(world.written)
+    own_hits = 0
+    for s, rr in keys:
+        d = scene.relation_dir[rr]
+        off = bt.beam_offsets(rr)[1:]                         # halo rays only
+        org = (scene.station_pos[s] - bt.span * d + off).astype(np.float32)
+        dirs = np.broadcast_to(d, org.shape).astype(np.float32)
+        f_ids, fv0, fe1, fe2, *_ = bt.facts[rr]
+        _, li = mt_closest(fv0, fe1, fe2, org, dirs, np.full(len(org), 10.0, np.float32), np.float32(1e-3))
+        hit_tri = f_ids[li[li >= 0]]
+        owners = [order[(t - n_rec) // F] for t in hit_tri]
+        own_hits += sum(1 for o in owners if o == (s, rr))
+    assert own_hits == 0
