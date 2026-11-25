@@ -47,7 +47,7 @@ class UpdatableStructure:
         device.wait_for_idle()
 
 
-class SpecularScene:
+class TriangleScene:
     def __init__(self, device, scene):
         # These arrays bind directly to shader buffers, so dtype and shape are ABI.
         vertices = scene["tri_vertices"]
@@ -63,42 +63,56 @@ class SpecularScene:
         ]:
             if scene[key].dtype != dtype or scene[key].shape != shape:
                 raise ValueError(f"{key} requires {dtype} with shape {shape}")
-        if not np.all(scene["tri_reflectance"][scene["tri_kind"] == 1] == 1):
-            raise ValueError("This prototype supports fully reflective facts only")
         owners = scene["tri_station"][scene["tri_kind"] == 0]
         if np.any((owners < 0) | (owners >= len(scene["station_pos"]))):
             raise ValueError("Invalid receiver owner")
+        kinds = scene["tri_kind"]
+        if np.any(kinds > 1):
+            raise ValueError("Unknown primitive kind")
+        self.order = np.argsort(kinds, kind="stable")
         self.vertices = gpu_buffer(
             device,
-            vertices,
+            vertices[self.order],
             sp.BufferUsage.shader_resource
             | sp.BufferUsage.acceleration_structure_build_input,
-        )
-        geometry = sp.AccelerationStructureBuildInputTriangles(
-            {
-                "vertex_buffers": [self.vertices],
-                "vertex_count": len(vertices) * 3,
-                "vertex_format": sp.Format.rgb32_float,
-                "vertex_stride": 12,
-            }
         )
         self.device = device
         self.shape = vertices.shape
         self.station_count = len(scene["station_pos"])
         self.relation_count = len(scene["relation_dir"])
         build_start = perf_counter()
-        self.blas = UpdatableStructure(
-            device, geometry, sp.AccelerationStructureKind.bottom_level
+        self.bottom_levels = []
+        nonempty = np.unique(kinds, return_counts=True)
+        self.instances = device.create_acceleration_structure_instance_list(
+            len(nonempty[0])
         )
-        self.instances = device.create_acceleration_structure_instance_list(1)
-        self.instances.write(
-            0,
-            {
-                "transform": sp.float3x4.identity(),
-                "instance_mask": 255,
-                "acceleration_structure": self.blas.structure.handle,
-            },
-        )
+        offset = 0
+        for i, (kind, count) in enumerate(zip(*nonempty)):
+            geometry = sp.AccelerationStructureBuildInputTriangles(
+                {
+                    "vertex_buffers": [
+                        {"buffer": self.vertices, "offset": offset * 36}
+                    ],
+                    "vertex_count": int(count) * 3,
+                    "vertex_format": sp.Format.rgb32_float,
+                    "vertex_stride": 12,
+                    "flags": sp.AccelerationStructureGeometryFlags.opaque,
+                }
+            )
+            blas = UpdatableStructure(
+                device, geometry, sp.AccelerationStructureKind.bottom_level
+            )
+            self.bottom_levels.append(blas)
+            self.instances.write(
+                i,
+                {
+                    "transform": sp.float3x4.identity(),
+                    "instance_mask": 1 << int(kind),
+                    "instance_id": offset,
+                    "acceleration_structure": blas.structure.handle,
+                },
+            )
+            offset += int(count)
         self.tlas = UpdatableStructure(
             device,
             self.instances.build_input_instances(),
@@ -106,15 +120,19 @@ class SpecularScene:
         )
         self.metrics = {
             "as_build_wall_ms": (perf_counter() - build_start) * 1000,
-            "as_bytes": self.blas.sizes.acceleration_structure_size
-            + self.tlas.sizes.acceleration_structure_size,
-            "resident_scratch_bytes": self.blas.scratch.size + self.tlas.scratch.size,
+            "as_bytes": sum(
+                s.sizes.acceleration_structure_size
+                for s in (*self.bottom_levels, self.tlas)
+            ),
+            "resident_scratch_bytes": sum(
+                s.scratch.size for s in (*self.bottom_levels, self.tlas)
+            ),
         }
         self.bindings = {
             "scene": self.tlas.structure,
             "vertices": self.vertices,
-            "kinds": gpu_buffer(device, scene["tri_kind"]),
-            "owners": gpu_buffer(device, scene["tri_station"]),
+            "kinds": gpu_buffer(device, kinds[self.order]),
+            "owners": gpu_buffer(device, scene["tri_station"][self.order]),
             "stations": gpu_buffer(device, scene["station_pos"]),
             "directions": gpu_buffer(device, scene["relation_dir"]),
             "tMin": float(scene["t_min"]),
@@ -126,10 +144,19 @@ class SpecularScene:
         if vertices.dtype != np.float32 or vertices.shape != self.shape:
             raise ValueError("Refits require the original float32 geometry shape")
         begin = perf_counter()
-        self.vertices.copy_from_numpy(np.ascontiguousarray(vertices))
-        self.blas.submit(self.device, update=True)
+        self.vertices.copy_from_numpy(np.ascontiguousarray(vertices[self.order]))
+        for blas in self.bottom_levels:
+            blas.submit(self.device, update=True)
         self.tlas.submit(self.device, update=True)
         return (perf_counter() - begin) * 1000
+
+
+class SpecularScene(TriangleScene):
+    def __init__(self, device, scene):
+        if not np.all(scene["tri_reflectance"][scene["tri_kind"] == 1] == 1):
+            raise ValueError("This prototype supports fully reflective facts only")
+        super().__init__(device, scene)
+        del self.bindings["kinds"]
 
     def trace(self, kernel, queries):
         device = self.device
@@ -176,7 +203,7 @@ class SpecularScene:
         return output.to_numpy().view(np.int32).reshape(n, width), metrics
 
 
-def open_kernel():
+def open_kernel(shader="specular.slang"):
     adapter = next(
         (
             a
@@ -199,9 +226,7 @@ def open_kernel():
     ):
         if not device.has_feature(feature):
             raise RuntimeError(f"{adapter.name} lacks {feature}")
-    kernel = device.create_compute_kernel(
-        device.load_program("specular.slang", ["trace"])
-    )
+    kernel = device.create_compute_kernel(device.load_program(shader, ["trace"]))
     print(adapter.name)
     return device, kernel
 
