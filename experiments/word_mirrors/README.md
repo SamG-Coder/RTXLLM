@@ -38,3 +38,17 @@ Run from the repository root with the E12 pinned Pride edition and the archive b
 ```sh
 python experiments/word_mirrors/pilot.py BOOK_DIRECTORY E14.npz validation.json
 ```
+
+## Generate from saved mirrors
+
+The generator persists the fitted mirror vertices, station positions and radii, vocabulary and E14 emission triangles in one archive. At each generation step with a dish-owning predecessor it launches a fresh 512-ray annulus. Vulkan traversal selects the stations at up to three successive hits (T). The host pools their votes, and a second Vulkan scene supplies the emission and prior probabilities at their addressed rows and columns (S). The sampler draws from the resulting vocabulary distribution. A predecessor without a dish uses the prior. The build uses the pinned Pride training portion and the corresponding E14 archive. A fresh inference process takes only the fitted archive, prompt, depth and sampling settings.
+
+```sh
+python experiments/word_mirrors/live.py build BOOK_DIRECTORY E14.npz fitted-mirrors.npz
+python experiments/word_mirrors/live.py generate fitted-mirrors.npz Elizabeth --count 128 --seed 3
+python experiments/word_mirrors/check_live.py BOOK_DIRECTORY fitted-mirrors.npz live.json
+```
+
+Use a new output filename for the build. Set `--max-hits 1` to disable both reflections or `--max-hits 2` to allow one. Outputs include the exact token bytes in hex and the number of hits at each depth. The registered annular beam and fixed 0.1 mixture make this an executable version of the original pilot.
+
+On RTX 5080 the 1,005,777-byte archive reproduced the same 128 tokens in two fresh processes. The sample began “Elizabeth, that there was a word. he left the evening last week for your proposals”. The 125 station queries produced 18,760 first hits, 13,756 second hits and 6,185 third hits. One warm run took 0.570 seconds for 128 tokens, including host aggregation and sampling. Three generated steps used only the prior. For each of 11 predecessor words, the verifier compared all 3,338 next-token probabilities to a CPU triangle tracer and independently pooled training distributions. The largest absolute error across both depths was 3.21 × 10⁻⁸. Enabling reflections changed nine distributions. These checks establish that reflected paths affect a running generator. The validation comparison above still favors the Gaussian model. [Recorded generation](live.json)
