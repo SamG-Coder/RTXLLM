@@ -33,6 +33,8 @@ class Memory:
 
         self.search = kernel("score")
         self.read = kernel("readRow")
+        self.context = kernel("scoreContext")
+        self.weights = kernel("liveWeights")
 
     def build(self, words):
         widths = np.array([len(w) + 1 for w in words], np.int32)
@@ -53,7 +55,7 @@ class Memory:
         )
         self.width = int(widths.max())
 
-    def counts(self, words, delay):
+    def counts(self, words, delay, predecessors=None):
         starts = np.r_[0, np.cumsum([len(w) for w in words])].astype(np.uint32)
         flat = np.frombuffer(b"".join(words), np.uint8).astype(np.uint32)
         out = gpu_buffer(
@@ -61,7 +63,14 @@ class Memory:
             np.empty((len(words), 2), np.int32),
             sp.BufferUsage.unordered_access,
         )
-        self.search.dispatch(
+        tagged = predecessors is not None
+        extra = (
+            {"predecessors": gpu_buffer(self.device, predecessors.astype(np.uint32))}
+            if tagged
+            else {}
+        )
+        kernel = self.context if tagged else self.search
+        kernel.dispatch(
             thread_count=[len(words), 1, 1],
             vars={
                 "scene": self.scene.tlas.structure,
@@ -70,6 +79,7 @@ class Memory:
                 "starts": gpu_buffer(self.device, starts),
                 "targetBytes": gpu_buffer(self.device, flat),
                 "counts": out,
+                **extra,
             },
         )
         return out.to_numpy().view(np.int32).reshape(-1, 2)

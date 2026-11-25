@@ -1,0 +1,56 @@
+{
+  "books": {
+    "holmes-1661": {
+      "targets": 128961,
+      "unknown_targets": 20718,
+      "uniform": {
+        "bits_per_token": 10.141411398738326,
+        "fraction_rerouted": 0.0
+      },
+      "lagged": {
+        "bits_per_token": 10.13651273207332,
+        "fraction_rerouted": 0.8302442320687325
+      },
+      "context": {
+        "bits_per_token": 10.108978989424036,
+        "fraction_rerouted": 0.5339801139106092
+      },
+      "gain": 0.032432409314289146
+    },
+    "war-36": {
+      "targets": 73964,
+      "unknown_targets": 14210,
+      "uniform": {
+        "bits_per_token": 11.55232667877311,
+        "fraction_rerouted": 0.0
+      },
+      "lagged": {
+        "bits_per_token": 11.556894511962787,
+        "fraction_rerouted": 0.8472906403940886
+      },
+      "context": {
+        "bits_per_token": 11.521617030524983,
+        "fraction_rerouted": 0.5444757213230119
+      },
+      "gain": 0.030709648248127053
+    },
+    "moby-2701": {
+      "targets": 281050,
+      "unknown_targets": 62587,
+      "uniform": {
+        "bits_per_token": 12.0316095127974,
+        "fraction_rerouted": 0.0
+      },
+      "lagged": {
+        "bits_per_token": 12.036961046937446,
+        "fraction_rerouted": 0.827743780657325
+      },
+      "context": {
+        "bits_per_token": 11.985209531466225,
+        "fraction_rerouted": 0.500135810951156
+      },
+      "gain": 0.04639998133117551
+    }
+  },
+  "passes": true
+}
