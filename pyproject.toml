@@ -1,0 +1,14 @@
+[project]
+name = "rtxllm"
+version = "0.0.1"
+description = "Experimental language model whose memory is scene geometry queried by hardware ray tracing"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26"]
+
+[project.optional-dependencies]
+rtx = ["slangpy==0.43.1"]
+test = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
