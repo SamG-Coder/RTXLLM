@@ -27,6 +27,12 @@ def select_rows(train, width, source, output, device, kernel):
     mirror, _, _, _, retention = read(source)
     scene = TriangleScene(device, mirror)
     at = addresses(device, kernel, scene, h, width)
+    strips, kept = budgeted_strips(at, h, y)
+    save(output, mirror, strips, width, GRID, retention)
+    return kept, len(strips["tri_kind"])
+
+
+def budgeted_strips(at, h, y):
     if np.any(at < 0):
         raise ValueError("Unexpected invalid training return")
     keys, inverse = np.unique(at, return_inverse=True)
@@ -74,8 +80,7 @@ def select_rows(train, width, source, output, device, kernel):
     ids = np.r_[keys[keep], BACKOFF + np.arange(257)]
     strips = write_strips(np.vstack((full[keep], full[n:])), ids)
     assert len(strips["tri_kind"]) <= BUDGET
-    save(output, mirror, strips, width, GRID, retention)
-    return len(keep), len(strips["tri_kind"])
+    return strips, len(keep)
 
 
 def main():
