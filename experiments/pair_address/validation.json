@@ -1,0 +1,45 @@
+{
+  "book": "jekyll-43",
+  "targets": 143229,
+  "model_sha256": "1767597d9146df288cca354c4ac97a10a908c5305da7ec6777d098621cc5d914",
+  "no_copy_bpb": 2.0301653096285763,
+  "conditions": {
+    "one_256": {
+      "bpb": 2.0196287007699465,
+      "rays": 4865769,
+      "coverage": 0.6156644255004224,
+      "copy_accuracy": 0.31854934736507867,
+      "triangles": 143237,
+      "as_bytes": 8652544,
+      "search_wall_s": 0.13483190000988543
+    },
+    "one_2048": {
+      "bpb": 2.0051946310757875,
+      "rays": 6334868,
+      "coverage": 0.7271223006514044,
+      "copy_accuracy": 0.3579528541936723,
+      "triangles": 143237,
+      "as_bytes": 8652544,
+      "search_wall_s": 0.010601499991025776
+    },
+    "pair_256": {
+      "bpb": 2.0190751733963905,
+      "rays": 2079848,
+      "coverage": 0.6631966989925224,
+      "copy_accuracy": 0.30846729621324576,
+      "triangles": 143237,
+      "as_bytes": 8652544,
+      "search_wall_s": 0.011125999997602776
+    },
+    "pair_2048": {
+      "bpb": 1.985942483904715,
+      "rays": 4711722,
+      "coverage": 0.9353343247526688,
+      "copy_accuracy": 0.38761784618600104,
+      "triangles": 143237,
+      "as_bytes": 8652544,
+      "search_wall_s": 0.010238200004096143
+    }
+  },
+  "passes": true
+}
