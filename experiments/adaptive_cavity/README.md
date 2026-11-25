@@ -11,7 +11,7 @@ The final byte selects a physical detector page. Either one or seven preceding b
 
 The seven-return adaptive model missed the required 0.05 bits/byte gain over each of adaptive one and fixed seven. Its nonempty-row coverage exceeded 99.99% on test, and all traced paths completed. Recovering coverage alone did not recover predictive accuracy. The JSON files alongside this document include all count baselines, serialized sizes and triangle counts.
 
-A post-hoc modified Kneser–Ney six-gram baseline scored 2.0302 bits/byte on the 143,229 Jekyll and Hyde targets and 2.0693 on the 184,725 Time Machine targets. It fit the four complete training books separately and used the same eight-byte evaluation warmup. On The Time Machine, the adaptive seven-return cavity used 1.0193 more bits per byte than this reference. [Baseline implementation](../../src/rtxllm/baselines/ngram.py)
+A post-hoc modified Kneser-Ney six-gram baseline scored 2.0302 bits/byte on the 143,229 Jekyll and Hyde targets and 2.0693 on the 184,725 Time Machine targets. It fit the four complete training books separately and used the same eight-byte evaluation warmup. On The Time Machine, the adaptive seven-return cavity used 1.0193 more bits per byte than this reference. [Baseline implementation](../../src/rtxllm/baselines/ngram.py)
 
 ## Reproduction
 
