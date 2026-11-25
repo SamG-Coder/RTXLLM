@@ -146,3 +146,13 @@ def test_committed_fixtures_match_reference():
             assert np.array_equal(z[k], fresh[k]), (mode, k)
         for k in ("expected_answer", "expected_miss", "tri_vertices"):
             assert np.allclose(z[k], fresh[k], atol=1e-6), (mode, k)
+
+
+def test_per_hop_agreement_counts_paths_without_finished_lineage():
+    from types import SimpleNamespace
+    from rtxllm.core.world import Path as WPath
+    from rtxllm.evaluation import per_hop_agreement
+    paths = [WPath(0, (0, 1), UNIQUE, {2: 1.0}, False, "val", (0, 1, 2)),
+             WPath(0, (0, 1), UNIQUE, {2: 1.0}, False, "val", (0, 1, 2))]
+    res = SimpleNamespace(receiver_paths=[[((0, 1, 2), 1.0)], []])  # 2nd: all energy overflowed
+    assert per_hop_agreement(res, paths) == 0.5

@@ -64,12 +64,14 @@ def method_trace(scene, paths, cap=None):
 
 def per_hop_agreement(result, paths):
     """Fraction of hops on UNIQUE paths where the dominant lineage's station
-    matches the symbolic station sequence."""
+    matches the symbolic station sequence. A path with no finished lineage
+    (all energy to overflow/floor) still contributes its gold hops, all unmatched."""
     agree = total = 0
     for i, p in enumerate(paths):
-        if p.category != UNIQUE or not result.receiver_paths[i]:
+        if p.category != UNIQUE:
             continue
-        best = max(result.receiver_paths[i], key=lambda x: x[1])[0]
+        rp = result.receiver_paths[i]
+        best = max(rp, key=lambda x: x[1])[0] if rp else ()
         for h in range(1, len(p.stations)):
             total += 1
             agree += int(h < len(best) and best[h] == p.stations[h])
