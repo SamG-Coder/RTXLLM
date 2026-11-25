@@ -1,0 +1,1102 @@
+{
+ "kn_val_bpb_by_order": {
+  "1": 4.567447964585207,
+  "2": 3.421606376727448,
+  "3": 2.6770844139858245,
+  "4": 2.0955678627089918,
+  "5": 1.85223659774869,
+  "6": 1.7737341114791114,
+  "7": 1.759196154079805,
+  "8": 1.761852853886601
+ },
+ "parity": {
+  "4/similarity": 0.0,
+  "4/random": 0.0,
+  "5/similarity": 0.0,
+  "5/random": 0.0
+ },
+ "beams": [
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    0.5
+   ],
+   "core": 0.95,
+   "delta_all": 0.00312530908808563,
+   "delta_rare": -0.0009628963422013348,
+   "delta_unseen": -0.00014857899350754816,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    0.5
+   ],
+   "core": 0.9,
+   "delta_all": 0.00711549221704966,
+   "delta_rare": -0.0016736208262401785,
+   "delta_unseen": -0.00023092615657981365,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    0.5
+   ],
+   "core": 0.7,
+   "delta_all": 0.02769563738793009,
+   "delta_rare": -0.0024724344024665904,
+   "delta_unseen": 3.3856463627184525e-05,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    0.5
+   ],
+   "core": 0.5,
+   "delta_all": 0.05315594965998964,
+   "delta_rare": -0.0006616339962323192,
+   "delta_unseen": 0.001132398170213908,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    1.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.015021552096273393,
+   "delta_rare": 0.00039515975054395366,
+   "delta_unseen": -0.00024639785241206485,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    1.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.036315387215998994,
+   "delta_rare": 0.0022924642552319507,
+   "delta_unseen": -0.00023961241781161123,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    1.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.15512859476809623,
+   "delta_rare": 0.023352760035857,
+   "delta_unseen": 0.002013941991150061,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    1.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.32159829372173254,
+   "delta_rare": 0.06606700126396975,
+   "delta_unseen": 0.007432707372902284,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    2.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.01717150971838465,
+   "delta_rare": 0.0030324229643819626,
+   "delta_unseen": -0.0001315712006066087,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    2.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.041441052291305805,
+   "delta_rare": 0.007564309540759265,
+   "delta_unseen": 0.00024149701837981375,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    2.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.17530124108701914,
+   "delta_rare": 0.038810486615198224,
+   "delta_unseen": 0.005048409961290526,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    2.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.3619785853443916,
+   "delta_rare": 0.09174857316976417,
+   "delta_unseen": 0.013860425068682736,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    4.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.020513133165437448,
+   "delta_rare": 0.006604694433558092,
+   "delta_unseen": 0.0033215495432298153,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    4.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.04856657114402256,
+   "delta_rare": 0.015035137928053121,
+   "delta_unseen": 0.007179968557597275,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    4.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.199037263121944,
+   "delta_rare": 0.0637026492772502,
+   "delta_unseen": 0.02721506387697551,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    4.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.40621816593975085,
+   "delta_rare": 0.13691988355765453,
+   "delta_unseen": 0.053778325007276126,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.015917464082563677,
+   "delta_rare": 0.0016047047022706208,
+   "delta_unseen": -0.00027848484381275726,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.03847003939273077,
+   "delta_rare": 0.004568798692030617,
+   "delta_unseen": -0.000303408642037596,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.1634695376040393,
+   "delta_rare": 0.029078240072492267,
+   "delta_unseen": 0.0016510280667165964,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "similarity",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.33775020303755293,
+   "delta_rare": 0.074635683001911,
+   "delta_unseen": 0.00634177442482687,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    0.5
+   ],
+   "core": 0.95,
+   "delta_all": 0.002494115992952051,
+   "delta_rare": 0.00019813072502967622,
+   "delta_unseen": 0.0004981956260231665,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    0.5
+   ],
+   "core": 0.9,
+   "delta_all": 0.006047768678393349,
+   "delta_rare": 0.0005265795831986301,
+   "delta_unseen": 0.0010047429831088206,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    0.5
+   ],
+   "core": 0.7,
+   "delta_all": 0.02563265817844855,
+   "delta_rare": 0.0029540754301177973,
+   "delta_unseen": 0.0031156598136131727,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    0.5
+   ],
+   "core": 0.5,
+   "delta_all": 0.05065736318410345,
+   "delta_rare": 0.006921504773344512,
+   "delta_unseen": 0.005365799497583603,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    1.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.01493768751367646,
+   "delta_rare": 0.00267386176644752,
+   "delta_unseen": 0.0008334943928773082,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    1.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.0372041433584803,
+   "delta_rare": 0.00647870136238877,
+   "delta_unseen": 0.0017505203708334356,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    1.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.1636475055602022,
+   "delta_rare": 0.03275323867747657,
+   "delta_unseen": 0.00622529948467501,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    1.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.3421779101265685,
+   "delta_rare": 0.07813594819893414,
+   "delta_unseen": 0.01199782040021114,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    2.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.016983183779058997,
+   "delta_rare": 0.0038038333586056933,
+   "delta_unseen": -0.00024143143955833758,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    2.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.041426826338643155,
+   "delta_rare": 0.008804316133989751,
+   "delta_unseen": -0.00014991957979547437,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    2.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.1774135190903507,
+   "delta_rare": 0.040502524834868645,
+   "delta_unseen": 0.0026106180666458515,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    2.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.3679156673714286,
+   "delta_rare": 0.09267390095693842,
+   "delta_unseen": 0.008393180919613493,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    4.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.01893239346102768,
+   "delta_rare": 0.0054426889721096924,
+   "delta_unseen": 0.0009752355234022547,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    4.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.0454197862453325,
+   "delta_rare": 0.012332517884099354,
+   "delta_unseen": 0.002569992297347435,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    4.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.18980930493346979,
+   "delta_rare": 0.053320026910365685,
+   "delta_unseen": 0.012736947502294671,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    4.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.39007807756527857,
+   "delta_rare": 0.11731829314915349,
+   "delta_unseen": 0.027418864998101124,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.01592536665698253,
+   "delta_rare": 0.003214892618772417,
+   "delta_unseen": 0.00026623054460861895,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.03922724023087352,
+   "delta_rare": 0.007558421549205027,
+   "delta_unseen": 0.0006983322396234212,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.17008744660195307,
+   "delta_rare": 0.03611943507230442,
+   "delta_unseen": 0.003804146299535079,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 4,
+   "grid": "random",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.353920126092213,
+   "delta_rare": 0.08425504599684745,
+   "delta_unseen": 0.008817214057847906,
+   "n_rare": 1162,
+   "n_unseen": 506
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    0.5
+   ],
+   "core": 0.95,
+   "delta_all": 0.001329972602148197,
+   "delta_rare": -0.00042334022925910933,
+   "delta_unseen": -0.0005409742423641437,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    0.5
+   ],
+   "core": 0.9,
+   "delta_all": 0.0033263259437916345,
+   "delta_rare": -0.000756893885802567,
+   "delta_unseen": -0.001043880518527845,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    0.5
+   ],
+   "core": 0.7,
+   "delta_all": 0.015086048335546907,
+   "delta_rare": -0.0012892475853894345,
+   "delta_unseen": -0.0027173053525452145,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    0.5
+   ],
+   "core": 0.5,
+   "delta_all": 0.030927628600033476,
+   "delta_rare": -0.000681681009027893,
+   "delta_unseen": -0.003921955141381797,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    1.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.008194536311017561,
+   "delta_rare": -0.00047803295948216384,
+   "delta_unseen": -0.0006305936715900535,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    1.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.021563896494041414,
+   "delta_rare": -0.00016614561707083253,
+   "delta_unseen": -0.0011660370957937648,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    1.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.10377764950243412,
+   "delta_rare": 0.008554316187568349,
+   "delta_unseen": -0.002438248098383084,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    1.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.22429301873397042,
+   "delta_rare": 0.029351445836803856,
+   "delta_unseen": -0.0024496686122755878,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    2.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.010300127136992344,
+   "delta_rare": 0.0002838431716969376,
+   "delta_unseen": 0.0001997560212541503,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    2.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.026376471457832437,
+   "delta_rare": 0.0016196580722943382,
+   "delta_unseen": 0.0006281210368603231,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    2.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.12211876357914507,
+   "delta_rare": 0.016044307586800925,
+   "delta_unseen": 0.003975498255791673,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    2.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.2604170670610081,
+   "delta_rare": 0.04458107374576098,
+   "delta_unseen": 0.00945702144259521,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    4.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.012891297546594929,
+   "delta_rare": 0.00135705343199958,
+   "delta_unseen": 0.0010718077499274686,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    4.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.03205187729990774,
+   "delta_rare": 0.004264500390562227,
+   "delta_unseen": 0.0026883491856338993,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    4.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.14241876936335396,
+   "delta_rare": 0.027951604595063087,
+   "delta_unseen": 0.012549410240203606,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    4.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.2994567905732723,
+   "delta_rare": 0.06969354484893617,
+   "delta_unseen": 0.026771461551408603,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.009180072444691307,
+   "delta_rare": -0.00014592444954014442,
+   "delta_unseen": -0.00024957672629051395,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.023791316634986112,
+   "delta_rare": 0.0005665093081755375,
+   "delta_unseen": -0.0003870295161963795,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.11207086293575362,
+   "delta_rare": 0.01138638767822999,
+   "delta_unseen": -6.66592271473403e-06,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "similarity",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.2402832426423566,
+   "delta_rare": 0.03496404432305936,
+   "delta_unseen": 0.0016472290950828952,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    0.5
+   ],
+   "core": 0.95,
+   "delta_all": 0.0012270289101217323,
+   "delta_rare": 3.376762217046058e-05,
+   "delta_unseen": 0.00019312837185460655,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    0.5
+   ],
+   "core": 0.9,
+   "delta_all": 0.0031513004116054174,
+   "delta_rare": 0.00012460208355635736,
+   "delta_unseen": 0.0003965226525605923,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    0.5
+   ],
+   "core": 0.7,
+   "delta_all": 0.014855677423001427,
+   "delta_rare": 0.001034250280408885,
+   "delta_unseen": 0.0013088128999319318,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    0.5
+   ],
+   "core": 0.5,
+   "delta_all": 0.030887584361685025,
+   "delta_rare": 0.0027803896172896277,
+   "delta_unseen": 0.0023724163442913845,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    1.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.008540270213866226,
+   "delta_rare": 0.0005837773430774502,
+   "delta_unseen": 0.000968164515917574,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    1.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.022752738682931286,
+   "delta_rare": 0.0019295224978208827,
+   "delta_unseen": 0.001987576894769255,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    1.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.11067554899934078,
+   "delta_rare": 0.014705531899812172,
+   "delta_unseen": 0.006586431664531397,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    1.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.23985499268261334,
+   "delta_rare": 0.03974079283118197,
+   "delta_unseen": 0.01206602960548277,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    2.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.009708720972256262,
+   "delta_rare": 0.0010222860930582717,
+   "delta_unseen": 0.001592303900424516,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    2.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.025311292043541496,
+   "delta_rare": 0.0029529982271277806,
+   "delta_unseen": 0.0032939103997360565,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    2.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.11975557154386678,
+   "delta_rare": 0.019227874628771683,
+   "delta_unseen": 0.011191764795150043,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    2.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.2572442060476574,
+   "delta_rare": 0.04941569640875137,
+   "delta_unseen": 0.020922991575207536,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    4.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.011390125646710362,
+   "delta_rare": 0.0016122666203325575,
+   "delta_unseen": 0.0018637319866029397,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    4.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.028959760486299464,
+   "delta_rare": 0.004419041497524771,
+   "delta_unseen": 0.003994216653825178,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    4.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.13238340162476728,
+   "delta_rare": 0.026135954428238066,
+   "delta_unseen": 0.01473468206427138,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    4.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.28098636434606006,
+   "delta_rare": 0.06428090541974961,
+   "delta_unseen": 0.02875330545080469,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.95,
+   "delta_all": 0.009107354566028623,
+   "delta_rare": 0.0007940262210423598,
+   "delta_unseen": 0.001275255672937767,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.9,
+   "delta_all": 0.023987766621390346,
+   "delta_rare": 0.0024086651556703307,
+   "delta_unseen": 0.0026211800445265785,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.7,
+   "delta_all": 0.11500556087699249,
+   "delta_rare": 0.016742722486891733,
+   "delta_unseen": 0.008721014901716864,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  },
+  {
+   "order": 5,
+   "grid": "random",
+   "radii": [
+    1.0,
+    2.0
+   ],
+   "core": 0.5,
+   "delta_all": 0.24804862278664672,
+   "delta_rare": 0.04403637709509164,
+   "delta_unseen": 0.01603482284297132,
+   "n_rare": 4700,
+   "n_unseen": 1991
+  }
+ ],
+ "best_overall": {
+  "order": 5,
+  "grid": "random",
+  "radii": [
+   0.5
+  ],
+  "core": 0.95,
+  "delta_all": 0.0012270289101217323,
+  "delta_rare": 3.376762217046058e-05,
+  "delta_unseen": 0.00019312837185460655,
+  "n_rare": 4700,
+  "n_unseen": 1991
+ },
+ "best_rare": {
+  "order": 4,
+  "grid": "similarity",
+  "radii": [
+   0.5
+  ],
+  "core": 0.7,
+  "delta_all": 0.02769563738793009,
+  "delta_rare": -0.0024724344024665904,
+  "delta_unseen": 3.3856463627184525e-05,
+  "n_rare": 1162,
+  "n_unseen": 506
+ }
+}

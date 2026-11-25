@@ -54,3 +54,5 @@ Under this allocation rule, the seven-return advantage disappeared. Pruning comp
 ```powershell
 & $python -B experiments/conditioned_cavity/check_budget.py $book $out
 ```
+
+The subsequently merged layered six-gram Kneser-Ney scene scored 2.0171 bits/byte on the same 129,508 Dracula test targets, compared with 2.7949 for the seven-return cavity. Both evaluations used the same pinned edition, train/test boundaries and eight-byte warmup. [Layered reference results](../e8_hardware_backoff/README.md)
