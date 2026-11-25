@@ -199,6 +199,12 @@ def main():
     reader = device.create_compute_kernel(
         device.load_program("cavity_readout.slang", ["trace"])
     )
+    strip_probe = np.zeros((3, 256), np.int32)
+    strip_probe[0, 65] = 256
+    strip_probe[1, [0, 255]] = [192, 64]
+    np.testing.assert_array_equal(
+        read_strips(device, reader, write_strips(strip_probe), 3), strip_probe
+    )
     check_optics(device, kernel)
     result = (
         validate(device, kernel, reader, train, val, args.out)

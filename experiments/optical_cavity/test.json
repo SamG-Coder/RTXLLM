@@ -1,0 +1,40 @@
+{
+  "scored_bytes": 64636,
+  "training_bytes": 301669,
+  "exact_bigram": 3.514378189414621,
+  "exact_trigram": 2.8391971855138034,
+  "width_1": {
+    "bpb": 3.459771108237861,
+    "valid": 1.0,
+    "occupied": 0.9999845287455907,
+    "backoff_bpb": 3.458855521166129,
+    "grid": 128,
+    "retention": 0.5,
+    "checkpoint_bytes": 243254,
+    "mirror_triangles": 32770,
+    "readout_triangles": 4834
+  },
+  "width_8": {
+    "bpb": 3.476959011473094,
+    "valid": 1.0,
+    "occupied": 1.0,
+    "backoff_bpb": 3.458855521166129,
+    "grid": 128,
+    "retention": 0.25,
+    "checkpoint_bytes": 283310,
+    "mirror_triangles": 32770,
+    "readout_triangles": 13060
+  },
+  "shuffled": {
+    "bpb": 3.920568391269902,
+    "valid": 1.0,
+    "occupied": 0.9997834024382697,
+    "backoff_bpb": 3.458855521166129,
+    "grid": 128,
+    "retention": 0.25,
+    "checkpoint_bytes": 283310,
+    "mirror_triangles": 32770,
+    "readout_triangles": 13060
+  },
+  "passes": false
+}

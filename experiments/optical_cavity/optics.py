@@ -7,8 +7,18 @@ import numpy as np
 import slangpy as sp
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src" / "rtx"))
-from run_specular import TriangleScene, gpu_buffer
-from run_specular import open_kernel as open_kernel
+from run_specular import TriangleScene, gpu_buffer, open_kernel
+
+__all__ = [
+    "TriangleScene",
+    "cell_ids",
+    "check_optics",
+    "land",
+    "open_kernel",
+    "read_strips",
+    "reflector",
+    "write_strips",
+]
 
 EXTENT = 8.0
 
