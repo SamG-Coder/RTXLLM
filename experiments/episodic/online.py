@@ -26,43 +26,29 @@ def scene_from_vertices(vertices):
     return mesh(vertices, zeros, zeros, np.array([[1, 0, 0]]))
 
 
-class OnlineMemory:
-    def __init__(self, device, prior_vertices, ring_vertices, cursor, count, rng):
+def empty_ring():
+    rows = np.arange(2 * WINDOW)
+    centers = np.column_stack((np.full(len(rows), 300), rows, np.zeros(len(rows))))
+    return geometry(centers, TILT)["tri_vertices"]
+
+
+class EpisodicRing:
+    def __init__(self, device, ring_vertices, cursor, count):
         if not (
             0 <= cursor < WINDOW
             and 0 <= count <= WINDOW
             and (count == WINDOW or cursor == count)
         ):
             raise ValueError("Invalid ring cursor or count")
-        if ring_vertices.shape != (512, 3, 3) or prior_vertices.shape != (65536, 3, 3):
-            raise ValueError("Unexpected checkpoint geometry dimensions")
+        if ring_vertices.shape != (512, 3, 3):
+            raise ValueError("Unexpected ring geometry dimensions")
         self.device = device
-        self.prior_vertices = prior_vertices
-        self.probs = read_prior(device, scene_from_vertices(prior_vertices))
-        if not np.all(self.probs > 0) or not np.allclose(
-            self.probs.sum(1), 1, rtol=1e-5
-        ):
-            raise ValueError("Global prior geometry has invalid masses")
         self.vertices = ring_vertices
         self.scene = TriangleScene(device, scene_from_vertices(self.vertices))
         self.kernel = device.create_compute_kernel(
             device.load_program("episodic.slang", ["live"])
         )
-        self.cursor, self.count, self.rng = cursor, count, rng
-
-    @classmethod
-    def train(cls, device, documents, seed):
-        prior, _, _ = fit_prior(documents)
-        rows = np.arange(2 * WINDOW)
-        centers = np.column_stack((np.full(len(rows), 300), rows, np.zeros(len(rows))))
-        return cls(
-            device,
-            prior["tri_vertices"],
-            geometry(centers, TILT)["tri_vertices"],
-            0,
-            0,
-            np.random.default_rng(seed),
-        )
+        self.cursor, self.count = cursor, count
 
     def observe(self, byte):
         if not 0 <= byte < 256:
@@ -85,6 +71,32 @@ class OnlineMemory:
             ringCursor=self.cursor,
             ringCount=self.count,
         )[0]
+
+
+class OnlineMemory(EpisodicRing):
+    def __init__(self, device, prior_vertices, ring_vertices, cursor, count, rng):
+        if prior_vertices.shape != (65536, 3, 3):
+            raise ValueError("Unexpected prior geometry dimensions")
+        super().__init__(device, ring_vertices, cursor, count)
+        self.rng = rng
+        self.prior_vertices = prior_vertices
+        self.probs = read_prior(device, scene_from_vertices(prior_vertices))
+        if not np.all(self.probs > 0) or not np.allclose(
+            self.probs.sum(1), 1, rtol=1e-5
+        ):
+            raise ValueError("Global prior geometry has invalid masses")
+
+    @classmethod
+    def train(cls, device, documents, seed):
+        prior, _, _ = fit_prior(documents)
+        return cls(
+            device,
+            prior["tri_vertices"],
+            empty_ring(),
+            0,
+            0,
+            np.random.default_rng(seed),
+        )
 
     def sample(self):
         _, predicted, length, last = self.query()
