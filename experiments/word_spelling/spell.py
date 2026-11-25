@@ -120,6 +120,30 @@ class Speller:
                 return token
 
 
+def check_exclusion(spell, reference):
+    # Independent complement calculation. Stop walking a prefix as soon as it
+    # differs from every known token; all continuations from there are allowed.
+    trie = {}
+    for word in spell.known:
+        node = trie
+        for byte in word:
+            node = node.setdefault(byte, {})
+        node[STOP] = True
+    for shared in (False, True):
+        free = 0.0
+        stack = [(trie, START, 1.0)]
+        while stack:
+            node, last, prefix = stack.pop()
+            for byte in FIRST if last == START else NEXT:
+                row = SHARED if shared and last != START else last
+                mass = prefix * reference[row, byte]
+                if byte not in node:
+                    free += mass
+                elif byte in ALNUM:
+                    stack.append((node[byte], byte, mass))
+        np.testing.assert_allclose(spell.remaining[shared], free, atol=2e-7, rtol=0)
+
+
 def evaluate(reader, spell, folder):
     report = {
         "triangles": spell.triangles,
@@ -192,6 +216,7 @@ def main():
         store(args.spell, ref, identity)
         actual = Speller(reader, args.spell, identity)
         np.testing.assert_allclose(actual.probs, ref, atol=2e-6, rtol=0)
+        check_exclusion(actual, ref)
         return
     spell = Speller(reader, args.spell, identity)
     if args.phase == "test":
