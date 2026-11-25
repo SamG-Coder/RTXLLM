@@ -104,45 +104,67 @@ def evaluate(reader, spell, books):
     return {"books": report, "passes": all(r["gain"] >= 0.005 for r in report.values())}
 
 
-def generate(reader, spell, prompt, count, seed):
-    ts = tokenize(prompt)
-    if not ts or count < 0:
-        raise ValueError("Expected prompt and nonnegative count")
-    ids = {w: i for i, w in enumerate(reader.words)}
-    seq = [ids.get(w, 0) for w in ts]
-    history = [
-        int(c).to_bytes(2, "little") + w
-        for w, c in zip(ts, [0] + seq[:-1])
-        if w not in spell.known
-    ][-WINDOW:]
-    mem = Memory(reader)
-    if history:
-        mem.build(history)
-    rng = np.random.default_rng(seed)
-    prev = seq[-1]
-    output = []
-    dest = np.arange(len(ids))
-    for _ in range(count):
-        p = reader.predict(np.full(len(ids), prev), dest)[:, 1].astype(float)
-        if abs(p.sum() - 1) > 2e-6:
-            raise ArithmeticError("Invalid word distribution")
-        w = rng.choice(dest, p=p / p.sum())
-        copied = False
-        if w:
-            token = reader.words[w]
-        else:
-            copied = bool(history and rng.random() < WEIGHT)
-            if copied:
-                mass = weights(mem, len(history), prev)
-                row = rng.choice(len(history), p=mass / mass.sum())
-                token = mem.token(row)[2:]
+class Session:
+    def __init__(self, reader, spell, seed):
+        self.reader = reader
+        self.spell = spell
+        self.ids = {w: i for i, w in enumerate(reader.words)}
+        self.mem = Memory(reader)
+        self.history = []
+        self.prev = None
+        self.rng = np.random.default_rng(seed)
+
+    def observe(self, raw):
+        words = tokenize(raw)
+        if not words:
+            raise ValueError("Expected at least one observed token")
+        additions = []
+        for word in words:
+            current = self.ids.get(word, 0)
+            if not current:
+                context = self.prev if self.prev is not None else 0
+                additions.append(int(context).to_bytes(2, "little") + word)
+            self.prev = current
+        if additions:
+            self.history = (self.history + additions)[-WINDOW:]
+            self.mem.build(self.history)
+
+    def sample(self, count):
+        if self.prev is None or count < 0:
+            raise ValueError("Expected prompt and nonnegative count")
+        output = []
+        dest = np.arange(len(self.ids))
+        for _ in range(count):
+            p = self.reader.predict(np.full(len(dest), self.prev), dest)[:, 1].astype(
+                float
+            )
+            if abs(p.sum() - 1) > 2e-6:
+                raise ArithmeticError("Invalid word distribution")
+            w = self.rng.choice(dest, p=p / p.sum())
+            copied = False
+            if w:
+                token = self.reader.words[w]
             else:
-                token = spell.draw(rng)
-            history = (history + [int(prev).to_bytes(2, "little") + token])[-WINDOW:]
-            mem.build(history)
-        output.append({"hex": token.hex(), "copied": copied})
-        prev = w
-    return output
+                copied = bool(self.history and self.rng.random() < WEIGHT)
+                if copied:
+                    mass = weights(self.mem, len(self.history), self.prev)
+                    row = self.rng.choice(len(self.history), p=mass / mass.sum())
+                    token = self.mem.token(row)[2:]
+                else:
+                    token = self.spell.draw(self.rng)
+                self.history = (
+                    self.history + [int(self.prev).to_bytes(2, "little") + token]
+                )[-WINDOW:]
+                self.mem.build(self.history)
+            output.append({"hex": token.hex(), "copied": copied})
+            self.prev = w
+        return output
+
+
+def generate(reader, spell, prompt, count, seed):
+    session = Session(reader, spell, seed)
+    session.observe(prompt)
+    return session.sample(count)
 
 
 def main():
