@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 import sys
 import tempfile
 from pathlib import Path
@@ -13,19 +14,18 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "experiments/word_pairs"))
 from run_pairs import JEKYLL, PairScene, Reader, digest, emissions, scores, tokens
-import re
 
 GRID = np.array([0, 0.01, 0.025, 0.05, 0.1, 0.2, 0.35, 0.5, 0.7, 0.9])
 WALLPAPER = "fdd24cf8a952177d32321079a373ddbf4f98663aec8a8a0009bdff0e1ebbb622"
 
 
-def encoded_book(model, path, expected):
+def book_body(path, expected):
     if digest(path) != expected:
         raise ValueError("Book digest mismatch")
     body = re.search(
         rb"(?ms)^\*\*\* START OF[^\n]*\n(.*?)^\*\*\* END OF", path.read_bytes()
     )[1]
-    return model.encode(body)
+    return body
 
 
 def group(pair, n):
@@ -129,7 +129,7 @@ def main():
     name, sha = (
         ("jekyll-43", JEKYLL) if args.phase == "fit" else ("wallpaper-1952", WALLPAPER)
     )
-    seq = encoded_book(model, args.books / f"rtxllm-{name}.txt", sha)
+    seq = model.encode(book_body(args.books / f"rtxllm-{name}.txt", sha))
     a, b, c = seq[:-2], seq[1:-1], seq[2:]
     base = model.predict(b, c)[:, 1].astype(float)
     groups, mass, strength = cpu_lookups(rows, a, b, c)
