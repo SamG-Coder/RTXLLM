@@ -105,6 +105,13 @@ def trace(device, kernel, scene, origins):
     return paths.reshape(-1, RAYS, 3), len(samples)
 
 
+def mixture_grid(model, ids, q, has, prev, nxt):
+    return {
+        str(lam): score(model, ids, q, has, lam, prev, nxt)
+        for lam in (0.05, 0.1, 0.2, 0.3)
+    }
+
+
 def evaluate(model, ids, paths, radial, prev, nxt):
     rows = np.broadcast_to(np.arange(len(ids))[:, None], radial.shape)
     scores = []
@@ -118,7 +125,7 @@ def evaluate(model, ids, paths, radial, prev, nxt):
         total = weight.sum(1)
         weight /= np.where(total > 0, total, 1)[:, None]
         q = weight @ model.Pml[ids]
-        scores.append(score(model, ids, q, total > 0, 0.1, prev, nxt))
+        scores.append(mixture_grid(model, ids, q, total > 0, prev, nxt))
     return scores
 
 
@@ -136,19 +143,48 @@ def main():
             archive[k] for k in ("ids", "positions", "radii", "dishes")
         ]
     partner, scene, clipped = fit(pos, ids, model, triangles)
+    device, kernel = open_kernel("word_mirrors.slang")
+    report = dict(
+        targets=len(ev) - 1,
+        rays=len(ids) * RAYS,
+        clipped_normals=clipped,
+        gpu=device.info.adapter_name,
+        archive_sha256=hashlib.sha256(args.archive.read_bytes()).hexdigest(),
+    )
+    for label, launch_radii in (
+        ("annular", radii),
+        ("full_disc", np.zeros_like(radii)),
+    ):
+        report[label] = beam_conditions(
+            model, ev, ids, pos, launch_radii, device, kernel, scene, partner
+        )
+    coords = pos[ids]
+    d2 = np.sum((coords[:, None] - coords[None]) ** 2, axis=2)
+    transition = np.exp(-0.5 * d2) * model.rowtot[ids][None, :]
+    transition /= transition.sum(axis=1, keepdims=True)
+    q = model.Pml[ids]
+    pooled = np.zeros_like(q)
+    report["gaussian"] = []
+    has = np.ones(len(ids), dtype=bool)
+    for step in range(1, 4):
+        q = transition @ q
+        pooled += q
+        report["gaussian"].append(
+            {
+                "endpoint": mixture_grid(model, ids, q, has, ev[:-1], ev[1:]),
+                "pooled": mixture_grid(model, ids, pooled / step, has, ev[:-1], ev[1:]),
+            }
+        )
+    args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf8")
+
+
+def beam_conditions(model, ev, ids, pos, radii, device, kernel, scene, partner):
+    report = {}
     origins = beam_origins(pos, ids, radii, D, WIDTH, RAYS, back=WIDTH)
     inner2 = (1.05 * radii[:, None]) ** 2
     outer2 = np.maximum(WIDTH, 1.1 * radii[:, None]) ** 2
     radial = np.exp(
         -0.5 * (inner2 + (outer2 - inner2) * (np.arange(RAYS) + 0.5) / RAYS)
-    )
-    device, kernel = open_kernel("word_mirrors.slang")
-    report = dict(
-        targets=len(ev) - 1,
-        rays=len(origins),
-        clipped_normals=clipped,
-        gpu=device.info.adapter_name,
-        archive_sha256=hashlib.sha256(args.archive.read_bytes()).hexdigest(),
     )
     for name, order in (
         ("trained", np.arange(len(ids))),
@@ -181,7 +217,7 @@ def main():
                 model, ids, np.where(hits, graph, -1), radial, ev[:-1], ev[1:]
             )
         report[name] = entry
-    args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf8")
+    return report
 
 
 if __name__ == "__main__":
