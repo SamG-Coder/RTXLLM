@@ -1,0 +1,1806 @@
+{
+ "env": {
+  "python": "3.12.10",
+  "numpy": "2.5.5",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "processor": "AMD64 Family 26 Model 68 Stepping 0, AuthenticAMD"
+ },
+ "results": {
+  "specular": {
+   "0": {
+    "graph": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.885,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.01,
+       "mass_on_answer_set": 0.7625,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     }
+    },
+    "lookup": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.4425
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.38125
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "table_size": 3161
+    },
+    "trace": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.885,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.9966666666666667,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.01,
+       "mass_on_answer_set": 0.7625,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "per_hop_agreement": 0.9993333333333333,
+     "cpu_seconds": 2.0413676999887684,
+     "cpu_ms_per_query": 2.0413676999887684,
+     "rays_per_query": 5.12,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.23524999618530273,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_1hop": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.01,
+       "total_variation": 0.9325
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.55,
+       "abstain_accuracy": 0.55
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.88125
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.37,
+       "abstain_accuracy": 0.37
+      }
+     },
+     "cpu_seconds": 0.8450042000040412,
+     "cpu_ms_per_query": 0.8450042000040412,
+     "rays_per_query": 2.084,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.09200000017881393,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_shuffled": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.47,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.54,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.67
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.45,
+       "abstain_accuracy": 0.45
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.6266666666666667,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.68,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.5325
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.65,
+       "abstain_accuracy": 0.65
+      }
+     },
+     "cpu_seconds": 1.4251036000059685,
+     "cpu_ms_per_query": 1.4251036000059685,
+     "rays_per_query": 3.584,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.5737500190734863,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "scene": {
+     "triangles": 12519,
+     "stations": 512,
+     "facts": 2161,
+     "params": {
+      "hop_mode": "specular",
+      "emit_offset": 0.07500000000000001,
+      "emit_range": 2.1,
+      "transport_range": 10000.0,
+      "arrival_range": 0.30000000000000004,
+      "t_min": 0.001,
+      "max_events": 16,
+      "energy_floor": 0.001,
+      "transport_hits_facts": false
+     },
+     "geometry": {
+      "receiver_radius": 0.05,
+      "fact_radius": 0.05,
+      "fact_distance": 1.5,
+      "stack_gap": 0.5,
+      "relation_seed": 12345
+     }
+    }
+   },
+   "1": {
+    "graph": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 1.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.875,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 3,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.01,
+       "mass_on_answer_set": 0.7575,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     }
+    },
+    "lookup": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.4375
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 3,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.37875
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "table_size": 3132
+    },
+    "trace": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 1.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.87,
+       "total_variation": 0.005
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 3,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.01,
+       "mass_on_answer_set": 0.7575,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "per_hop_agreement": 1.0,
+     "cpu_seconds": 2.0481283999979496,
+     "cpu_ms_per_query": 2.0481283999979496,
+     "rays_per_query": 5.162,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.23675000667572021,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_1hop": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.005,
+       "total_variation": 0.9325
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.61,
+       "abstain_accuracy": 0.61
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.01,
+       "n_cycle": 3,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.87875
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.39,
+       "abstain_accuracy": 0.39
+      }
+     },
+     "cpu_seconds": 0.8671329000062542,
+     "cpu_ms_per_query": 0.8671329000062542,
+     "rays_per_query": 2.116,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.10000000149011612,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_shuffled": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.5066666666666667,
+       "accuracy": 0.0033333333333333335,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.59,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.64
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.56,
+       "abstain_accuracy": 0.56
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.7233333333333334,
+       "accuracy": 0.0,
+       "n_cycle": 3,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.65,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.54625
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.73,
+       "abstain_accuracy": 0.73
+      }
+     },
+     "cpu_seconds": 1.3920845999964513,
+     "cpu_ms_per_query": 1.3920845999964513,
+     "rays_per_query": 3.381,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.6317499876022339,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "scene": {
+     "triangles": 12477,
+     "stations": 512,
+     "facts": 2132,
+     "params": {
+      "hop_mode": "specular",
+      "emit_offset": 0.07500000000000001,
+      "emit_range": 2.1,
+      "transport_range": 10000.0,
+      "arrival_range": 0.30000000000000004,
+      "t_min": 0.001,
+      "max_events": 16,
+      "energy_floor": 0.001,
+      "transport_hits_facts": false
+     },
+     "geometry": {
+      "receiver_radius": 0.05,
+      "fact_radius": 0.05,
+      "fact_distance": 1.5,
+      "stack_gap": 0.5,
+      "relation_seed": 12345
+     }
+    }
+   },
+   "2": {
+    "graph": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 1.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.865,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 2,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.805,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     }
+    },
+    "lookup": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.4325
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 2,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.4025
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "table_size": 3150
+    },
+    "trace": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.9966666666666667,
+       "n_cycle": 1,
+       "cycle_accuracy": 1.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.865,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.9933333333333333,
+       "n_cycle": 2,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.805,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "per_hop_agreement": 0.9966666666666667,
+     "cpu_seconds": 2.0200197999947704,
+     "cpu_ms_per_query": 2.0200197999947704,
+     "rays_per_query": 5.079,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.2329999953508377,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_1hop": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.9325
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.53,
+       "abstain_accuracy": 0.53
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 2,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.9025
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.53,
+       "abstain_accuracy": 0.53
+      }
+     },
+     "cpu_seconds": 0.8186860999994678,
+     "cpu_ms_per_query": 0.8186860999994678,
+     "rays_per_query": 2.07,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.10599999874830246,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_shuffled": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.4633333333333333,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.44,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.71
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.5,
+       "abstain_accuracy": 0.5
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.6333333333333333,
+       "accuracy": 0.0,
+       "n_cycle": 2,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.62,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.5875
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.67,
+       "abstain_accuracy": 0.67
+      }
+     },
+     "cpu_seconds": 1.4411981999874115,
+     "cpu_ms_per_query": 1.4411981999874115,
+     "rays_per_query": 3.622,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.5615000128746033,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "scene": {
+     "triangles": 12491,
+     "stations": 512,
+     "facts": 2150,
+     "params": {
+      "hop_mode": "specular",
+      "emit_offset": 0.07500000000000001,
+      "emit_range": 2.1,
+      "transport_range": 10000.0,
+      "arrival_range": 0.30000000000000004,
+      "t_min": 0.001,
+      "max_events": 16,
+      "energy_floor": 0.001,
+      "transport_hits_facts": false
+     },
+     "geometry": {
+      "receiver_radius": 0.05,
+      "fact_radius": 0.05,
+      "fact_distance": 1.5,
+      "stack_gap": 0.5,
+      "relation_seed": 12345
+     }
+    }
+   }
+  },
+  "transport": {
+   "0": {
+    "graph": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.885,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.01,
+       "mass_on_answer_set": 0.7625,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     }
+    },
+    "lookup": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.4425
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.38125
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "table_size": 3161
+    },
+    "trace": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.885,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.01,
+       "mass_on_answer_set": 0.7625,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "per_hop_agreement": 1.0,
+     "cpu_seconds": 2.055503800002043,
+     "cpu_ms_per_query": 2.055503800002043,
+     "rays_per_query": 5.12,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.23524999618530273,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_1hop": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.01,
+       "total_variation": 0.9325
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.55,
+       "abstain_accuracy": 0.55
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.88125
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.37,
+       "abstain_accuracy": 0.37
+      }
+     },
+     "cpu_seconds": 0.827987700002268,
+     "cpu_ms_per_query": 0.827987700002268,
+     "rays_per_query": 2.084,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.09200000017881393,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_shuffled": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.47333333333333333,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.54,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.67
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.45,
+       "abstain_accuracy": 0.45
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.6266666666666667,
+       "accuracy": 0.0,
+       "n_cycle": 0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.68,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.5325
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.65,
+       "abstain_accuracy": 0.65
+      }
+     },
+     "cpu_seconds": 1.532929699998931,
+     "cpu_ms_per_query": 1.532929699998931,
+     "rays_per_query": 3.583,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.5747500061988831,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "scene": {
+     "triangles": 12519,
+     "stations": 512,
+     "facts": 2161,
+     "params": {
+      "hop_mode": "transport",
+      "emit_offset": 0.07500000000000001,
+      "emit_range": 2.1,
+      "transport_range": 10000.0,
+      "arrival_range": 0.30000000000000004,
+      "t_min": 0.001,
+      "max_events": 16,
+      "energy_floor": 0.001,
+      "transport_hits_facts": false
+     },
+     "geometry": {
+      "receiver_radius": 0.05,
+      "fact_radius": 0.05,
+      "fact_distance": 1.5,
+      "stack_gap": 0.5,
+      "relation_seed": 12345
+     }
+    }
+   },
+   "1": {
+    "graph": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 1.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.875,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 3,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.01,
+       "mass_on_answer_set": 0.7575,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     }
+    },
+    "lookup": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.4375
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 3,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.37875
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "table_size": 3132
+    },
+    "trace": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 1.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.875,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 3,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.01,
+       "mass_on_answer_set": 0.7575,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "per_hop_agreement": 1.0,
+     "cpu_seconds": 2.063234700006433,
+     "cpu_ms_per_query": 2.063234700006433,
+     "rays_per_query": 5.162,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.23675000667572021,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_1hop": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.005,
+       "total_variation": 0.9325
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.61,
+       "abstain_accuracy": 0.61
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.01,
+       "n_cycle": 3,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.87875
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.39,
+       "abstain_accuracy": 0.39
+      }
+     },
+     "cpu_seconds": 0.8411946999985958,
+     "cpu_ms_per_query": 0.8411946999985958,
+     "rays_per_query": 2.116,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.10000000149011612,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_shuffled": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.5066666666666667,
+       "accuracy": 0.0033333333333333335,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.59,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.64
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.56,
+       "abstain_accuracy": 0.56
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.7233333333333334,
+       "accuracy": 0.0,
+       "n_cycle": 3,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.65,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.54625
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.73,
+       "abstain_accuracy": 0.73
+      }
+     },
+     "cpu_seconds": 1.3491939999948954,
+     "cpu_ms_per_query": 1.3491939999948954,
+     "rays_per_query": 3.381,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.6317499876022339,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "scene": {
+     "triangles": 12477,
+     "stations": 512,
+     "facts": 2132,
+     "params": {
+      "hop_mode": "transport",
+      "emit_offset": 0.07500000000000001,
+      "emit_range": 2.1,
+      "transport_range": 10000.0,
+      "arrival_range": 0.30000000000000004,
+      "t_min": 0.001,
+      "max_events": 16,
+      "energy_floor": 0.001,
+      "transport_hits_facts": false
+     },
+     "geometry": {
+      "receiver_radius": 0.05,
+      "fact_radius": 0.05,
+      "fact_distance": 1.5,
+      "stack_gap": 0.5,
+      "relation_seed": 12345
+     }
+    }
+   },
+   "2": {
+    "graph": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 1.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.865,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 2,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.805,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     }
+    },
+    "lookup": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.4325
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 1.0,
+       "accuracy": 0.0,
+       "n_cycle": 2,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.4025
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "table_size": 3150
+    },
+    "trace": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 1.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.865,
+       "total_variation": 0.0
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 1.0,
+       "n_cycle": 2,
+       "cycle_accuracy": 1.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.805,
+       "total_variation": 0.0
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 1.0,
+       "abstain_accuracy": 1.0
+      }
+     },
+     "per_hop_agreement": 1.0,
+     "cpu_seconds": 2.026200299995253,
+     "cpu_ms_per_query": 2.026200299995253,
+     "rays_per_query": 5.079,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.2329999953508377,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_1hop": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.9325
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.53,
+       "abstain_accuracy": 0.53
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.0,
+       "accuracy": 0.0,
+       "n_cycle": 2,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.0,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.9025
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.53,
+       "abstain_accuracy": 0.53
+      }
+     },
+     "cpu_seconds": 0.8237373999872943,
+     "cpu_ms_per_query": 0.8237373999872943,
+     "rays_per_query": 2.07,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.10599999874830246,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "trace_shuffled": {
+     "metrics": {
+      "L2/unique": {
+       "n": 300,
+       "abstain_rate": 0.4633333333333333,
+       "accuracy": 0.0,
+       "n_cycle": 1,
+       "cycle_accuracy": 0.0
+      },
+      "L2/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.44,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.71
+      },
+      "L2/miss": {
+       "n": 100,
+       "abstain_rate": 0.5,
+       "abstain_accuracy": 0.5
+      },
+      "L3/unique": {
+       "n": 300,
+       "abstain_rate": 0.6333333333333333,
+       "accuracy": 0.0,
+       "n_cycle": 2,
+       "cycle_accuracy": 0.0
+      },
+      "L3/ambiguous": {
+       "n": 100,
+       "abstain_rate": 0.62,
+       "mass_on_answer_set": 0.0,
+       "total_variation": 0.5875
+      },
+      "L3/miss": {
+       "n": 100,
+       "abstain_rate": 0.67,
+       "abstain_accuracy": 0.67
+      }
+     },
+     "cpu_seconds": 1.446616000001086,
+     "cpu_ms_per_query": 1.446616000001086,
+     "rays_per_query": 3.622,
+     "crosstalk_rate": 0.0,
+     "miss_energy": 0.5615000128746033,
+     "floor_energy": 0.0,
+     "overflow_energy": 0.0,
+     "max_conservation_error": 0.0
+    },
+    "scene": {
+     "triangles": 12491,
+     "stations": 512,
+     "facts": 2150,
+     "params": {
+      "hop_mode": "transport",
+      "emit_offset": 0.07500000000000001,
+      "emit_range": 2.1,
+      "transport_range": 10000.0,
+      "arrival_range": 0.30000000000000004,
+      "t_min": 0.001,
+      "max_events": 16,
+      "energy_floor": 0.001,
+      "transport_hits_facts": false
+     },
+     "geometry": {
+      "receiver_radius": 0.05,
+      "fact_radius": 0.05,
+      "fact_distance": 1.5,
+      "stack_gap": 0.5,
+      "relation_seed": 12345
+     }
+    }
+   }
+  }
+ },
+ "acceptance": {
+  "specular": [
+   [
+    "seed0 L2/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed0 L2/unique trace acc>=0.95",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L2/unique lift over trace_1hop>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L2/unique lift over lookup>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L2/unique lift over trace_shuffled>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L3/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed0 L3/unique trace acc>=0.95",
+    true,
+    0.9967
+   ],
+   [
+    "seed0 L3/unique lift over trace_1hop>=0.5",
+    true,
+    0.9967
+   ],
+   [
+    "seed0 L3/unique lift over lookup>=0.5",
+    true,
+    0.9967
+   ],
+   [
+    "seed0 L3/unique lift over trace_shuffled>=0.5",
+    true,
+    0.9967
+   ],
+   [
+    "seed1 L2/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed1 L2/unique trace acc>=0.95",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L2/unique lift over trace_1hop>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L2/unique lift over lookup>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L2/unique lift over trace_shuffled>=0.5",
+    true,
+    0.9967
+   ],
+   [
+    "seed1 L3/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed1 L3/unique trace acc>=0.95",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L3/unique lift over trace_1hop>=0.5",
+    true,
+    0.99
+   ],
+   [
+    "seed1 L3/unique lift over lookup>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L3/unique lift over trace_shuffled>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed2 L2/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed2 L2/unique trace acc>=0.95",
+    true,
+    0.9967
+   ],
+   [
+    "seed2 L2/unique lift over trace_1hop>=0.5",
+    true,
+    0.9967
+   ],
+   [
+    "seed2 L2/unique lift over lookup>=0.5",
+    true,
+    0.9967
+   ],
+   [
+    "seed2 L2/unique lift over trace_shuffled>=0.5",
+    true,
+    0.9967
+   ],
+   [
+    "seed2 L3/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed2 L3/unique trace acc>=0.95",
+    true,
+    0.9933
+   ],
+   [
+    "seed2 L3/unique lift over trace_1hop>=0.5",
+    true,
+    0.9933
+   ],
+   [
+    "seed2 L3/unique lift over lookup>=0.5",
+    true,
+    0.9933
+   ],
+   [
+    "seed2 L3/unique lift over trace_shuffled>=0.5",
+    true,
+    0.9933
+   ]
+  ],
+  "transport": [
+   [
+    "seed0 L2/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed0 L2/unique trace acc>=0.95",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L2/unique lift over trace_1hop>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L2/unique lift over lookup>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L2/unique lift over trace_shuffled>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L3/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed0 L3/unique trace acc>=0.95",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L3/unique lift over trace_1hop>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L3/unique lift over lookup>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed0 L3/unique lift over trace_shuffled>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L2/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed1 L2/unique trace acc>=0.95",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L2/unique lift over trace_1hop>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L2/unique lift over lookup>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L2/unique lift over trace_shuffled>=0.5",
+    true,
+    0.9967
+   ],
+   [
+    "seed1 L3/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed1 L3/unique trace acc>=0.95",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L3/unique lift over trace_1hop>=0.5",
+    true,
+    0.99
+   ],
+   [
+    "seed1 L3/unique lift over lookup>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed1 L3/unique lift over trace_shuffled>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed2 L2/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed2 L2/unique trace acc>=0.95",
+    true,
+    1.0
+   ],
+   [
+    "seed2 L2/unique lift over trace_1hop>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed2 L2/unique lift over lookup>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed2 L2/unique lift over trace_shuffled>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed2 L3/unique n>=256",
+    true,
+    300
+   ],
+   [
+    "seed2 L3/unique trace acc>=0.95",
+    true,
+    1.0
+   ],
+   [
+    "seed2 L3/unique lift over trace_1hop>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed2 L3/unique lift over lookup>=0.5",
+    true,
+    1.0
+   ],
+   [
+    "seed2 L3/unique lift over trace_shuffled>=0.5",
+    true,
+    1.0
+   ]
+  ]
+ }
+}
