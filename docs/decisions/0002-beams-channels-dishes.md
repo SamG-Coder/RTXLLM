@@ -43,7 +43,12 @@ For hop `h` with relation `r = program[h]`, each station `x` holding energy `E_x
 6. After the last hop the station energies are the answer distribution;
    `Σ answer + lost = 1`. Decode: argmax, abstain only if no energy arrived.
 
-Closest hit, `t_min`, float32 and tie rules as ADR 0001. The CPU reference
+Per-ray outcome codes (both backends): station id ≥ 0 on arrival; −1 if the emission ray met no
+fact of its channel; −2 if it reflected but the transport ray met no receiver.
+`mirror_hit_energy[q, h]` sums the energy of rays with code ≠ −1.
+
+Closest hit, `t_min`, float32 and tie rules as ADR 0001. On RTX, `t_min`/`tmax` are bumped by one
+ulp to emulate the reference's open interval (as in the E1 kernel). The CPU reference
 (`rtxllm.cpu.beam.BeamTracer`) has an all-pairs mode and an exact broadphase mode that
 are tested to give identical results.
 
