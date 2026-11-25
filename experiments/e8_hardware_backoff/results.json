@@ -1,0 +1,201 @@
+{
+ "order": 6,
+ "env": {
+  "python": "3.12.10",
+  "numpy": "2.5.5",
+  "platform": "Windows-11-10.0.26300-SP0"
+ },
+ "books": {
+  "pride-1342": {
+   "train_bytes": 493508,
+   "fit_s": 0.10974880000867415,
+   "build_wall_ms": 204.79860001069028,
+   "instances": 391,
+   "dishes": 96082,
+   "triangles": 192164,
+   "as_bytes": 12940800,
+   "splits": {
+    "val": {
+     "scored": 105747,
+     "rtx_bpb": 1.7737123728993425,
+     "numpy_kn_bpb": 1.7737123728993425,
+     "dish_parity": true,
+     "max_abs_dp": 0.0,
+     "gpu_dispatch_ms": 0.05952,
+     "host_trace_wall_s": 0.02769580000312999,
+     "layers_hit_mean": 5.915014137516904,
+     "budget_curve": {
+      "1": {
+       "rtx_bpb": 5.349289132139361,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 4.567458540748474
+      },
+      "2": {
+       "rtx_bpb": 4.168543133983847,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 3.4215939578408197
+      },
+      "3": {
+       "rtx_bpb": 3.41569550373877,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.677073072133106
+      },
+      "4": {
+       "rtx_bpb": 2.7183851897393017,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.095573340709284
+      },
+      "5": {
+       "rtx_bpb": 2.2717823072937176,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 1.8522260344654782
+      },
+      "6": {
+       "rtx_bpb": 1.7737123728993425,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 1.7737123728993425
+      }
+     }
+    },
+    "test": {
+     "scored": 105747,
+     "rtx_bpb": 1.7368367424451032,
+     "numpy_kn_bpb": 1.7368367424451032,
+     "dish_parity": true,
+     "max_abs_dp": 0.0,
+     "gpu_dispatch_ms": 0.057152,
+     "host_trace_wall_s": 0.011323700004140846,
+     "layers_hit_mean": 5.919865338969427,
+     "budget_curve": {
+      "1": {
+       "rtx_bpb": 5.36224752484687,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 4.586563303304779
+      },
+      "2": {
+       "rtx_bpb": 4.159403707433257,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 3.416532076493569
+      },
+      "3": {
+       "rtx_bpb": 3.4036367112334025,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.6604189179454942
+      },
+      "4": {
+       "rtx_bpb": 2.6973466379940656,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.067573367611874
+      },
+      "5": {
+       "rtx_bpb": 2.246079466981636,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 1.8158875091986955
+      },
+      "6": {
+       "rtx_bpb": 1.7368367424451032,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 1.7368367424451032
+      }
+     }
+    }
+   }
+  },
+  "dracula-345": {
+   "train_bytes": 604405,
+   "fit_s": 0.12757240000064485,
+   "build_wall_ms": 228.88319999037776,
+   "instances": 421,
+   "dishes": 135131,
+   "triangles": 270262,
+   "as_bytes": 17790592,
+   "splits": {
+    "val": {
+     "scored": 129508,
+     "rtx_bpb": 1.9367301879781482,
+     "numpy_kn_bpb": 1.9367301879781482,
+     "dish_parity": true,
+     "max_abs_dp": 0.0,
+     "gpu_dispatch_ms": 0.07296,
+     "host_trace_wall_s": 0.1509717000008095,
+     "layers_hit_mean": 5.913063285665751,
+     "budget_curve": {
+      "1": {
+       "rtx_bpb": 5.491318581281882,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 4.501040768185129
+      },
+      "2": {
+       "rtx_bpb": 4.339285979959179,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 3.4348135579651284
+      },
+      "3": {
+       "rtx_bpb": 3.5423367297979986,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.7297011297597438
+      },
+      "4": {
+       "rtx_bpb": 2.871458718730342,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.2206159134648153
+      },
+      "5": {
+       "rtx_bpb": 2.4174542564853034,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.005188660447986
+      },
+      "6": {
+       "rtx_bpb": 1.9367301879781482,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 1.9367301879781482
+      }
+     }
+    },
+    "test": {
+     "scored": 129508,
+     "rtx_bpb": 2.0170879200817,
+     "numpy_kn_bpb": 2.0170879200817,
+     "dish_parity": true,
+     "max_abs_dp": 0.0,
+     "gpu_dispatch_ms": 0.072928,
+     "host_trace_wall_s": 0.01411220000591129,
+     "layers_hit_mean": 5.873606263705717,
+     "budget_curve": {
+      "1": {
+       "rtx_bpb": 5.496861068473129,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 4.51934082066867
+      },
+      "2": {
+       "rtx_bpb": 4.369377167676411,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 3.4883071316773986
+      },
+      "3": {
+       "rtx_bpb": 3.5598972729195277,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.7740847385220744
+      },
+      "4": {
+       "rtx_bpb": 2.911143296016331,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.2849599894988506
+      },
+      "5": {
+       "rtx_bpb": 2.47269394209548,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.081458456120432
+      },
+      "6": {
+       "rtx_bpb": 2.0170879200817,
+       "dish_parity": true,
+       "separately_fit_kn_bpb": 2.0170879200817
+      }
+     }
+    }
+   }
+  }
+ },
+ "passes": true
+}
