@@ -85,3 +85,29 @@ def test_rtx_beam_parity():
         assert out[k]["max_answer_diff"] < 1e-6
         assert out[k]["max_lost_diff"] < 1e-6
         assert out[k]["max_mirror_hit_diff"] < 1e-6
+
+
+@pytest.mark.parametrize("budget,rays", [(150, 2), (7, 32), (10**9, 32)])
+def test_broadphase_respects_pair_budget_exactly(world, budget, rays, monkeypatch):
+    """Codex's #43 case: no Moller-Trumbore call may exceed PAIR_BUDGET pairs, including
+    when a beam has more rays than the budget; results equal the all-pairs reference."""
+    import rtxllm.cpu.beam as beam_mod
+    scene = build_scene(world, GeometryConfig(receiver_radius=0.15, fact_radius=0.1, dish_radius=0.3))
+    q = world.two_hop["val"][:15]
+    ref = BeamTracer(scene, BeamParams(width=1.5, rays=rays), broadphase=False).trace(
+        [s for s, *_ in q], [(a, b) for _, a, b, _ in q])
+    sizes, real = [], beam_mod.mt_pairs
+
+    def spy(v0, e1, e2, o, d, ri, ti, tmax, t_min):
+        sizes.append(len(ri))
+        return real(v0, e1, e2, o, d, ri, ti, tmax, t_min)
+
+    monkeypatch.setattr(beam_mod, "mt_pairs", spy)
+    monkeypatch.setattr(BeamTracer, "PAIR_BUDGET", budget)
+    got = BeamTracer(scene, BeamParams(width=1.5, rays=rays), broadphase=True).trace(
+        [s for s, *_ in q], [(a, b) for _, a, b, _ in q])
+    assert np.array_equal(got.answer, ref.answer) and np.array_equal(got.lost, ref.lost)
+    assert sizes, "broadphase must have run"
+    assert max(sizes) <= budget                  # every Moller-Trumbore call, emission and receiver
+    if budget == 7:
+        assert rays + 1 > budget                 # covers the case B exceeds the budget

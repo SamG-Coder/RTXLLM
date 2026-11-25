@@ -194,25 +194,15 @@ class BeamTracer:
 
     def _emit_broadphase(self, xs, d, B, org, dirs, tmax, t_min, fv0, fe1, fe2, fcen, frad, reach):
         """Candidates per beam: facts whose bounding sphere meets the beam cylinder.
-        Pairs are flushed in bounded batches, so memory stays O(PAIR_BUDGET)."""
+        Every Moller-Trumbore call receives at most ``PAIR_BUDGET`` (ray, triangle)
+        pairs: the pair index space of each candidate block is sliced exactly (a
+        single candidate's B rays are split too when B exceeds the budget)."""
         sc = self.scene
         axis0 = sc.station_pos[xs] - self.span * d            # [nb, 3]
         w = float(np.linalg.norm(self.offsets, axis=1).max()) if len(self.offsets) else 0.0
         out_t = np.full(len(org), np.inf, np.float32)
         out_i = np.full(len(org), -1, np.int64)
-        pend_b, pend_f, pend_n = [], [], 0
-
-        def flush():
-            nonlocal pend_b, pend_f, pend_n
-            if not pend_b:
-                return
-            bi, fi = np.concatenate(pend_b), np.concatenate(pend_f)
-            ri = (bi[:, None] * B + np.arange(B)[None]).reshape(-1)
-            ti = np.repeat(fi, B)
-            t = mt_pairs(fv0, fe1, fe2, org, dirs, ri, ti, tmax, t_min)
-            self._merge_best(out_t, out_i, ri, ti, t)
-            pend_b, pend_f, pend_n = [], [], 0
-
+        budget = max(1, int(self.PAIR_BUDGET))
         for a in range(0, len(xs), 64):
             b = min(len(xs), a + 64)
             rel = fcen[None] - axis0[a:b, None]               # [nb, F, 3]
@@ -220,15 +210,14 @@ class BeamTracer:
             perp = np.linalg.norm(rel - depth[..., None] * d, axis=-1)
             cand = (perp <= w + frad[None] + 1e-4) & (depth >= -frad[None] - 1e-4) & (depth <= reach + frad[None] + 1e-4)
             bi, fi = np.nonzero(cand)
-            # split so that each pending batch stays within the pair budget
-            step = max(1, self.PAIR_BUDGET // B)
-            for c0 in range(0, len(bi), step):
-                pend_b.append(bi[c0:c0 + step] + a)
-                pend_f.append(fi[c0:c0 + step])
-                pend_n += min(step, len(bi) - c0) * B
-                if pend_n >= self.PAIR_BUDGET:
-                    flush()
-        flush()
+            total = len(bi) * B                                # pair p -> candidate p // B, ray p % B
+            for p0 in range(0, total, budget):
+                p = np.arange(p0, min(total, p0 + budget), dtype=np.int64)
+                c = p // B
+                ri = (bi[c] + a) * B + (p % B)
+                ti = fi[c]
+                t = mt_pairs(fv0, fe1, fe2, org, dirs, ri, ti, tmax, t_min)
+                self._merge_best(out_t, out_i, ri, ti, t)
         return out_t, out_i
 
     def _receiver_broadphase(self, o, d, tmax, t_min):
@@ -255,10 +244,15 @@ class BeamTracer:
             within = np.arange(k.sum()) - np.repeat(np.cumsum(k) - k, k)
             ri_all.append(ri)
             ti_all.append(order[base + within])
+        out_t = np.full(len(o), np.inf, np.float32)
+        out_i = np.full(len(o), -1, np.int64)
         if not ri_all:
-            return np.full(len(o), np.inf, np.float32), np.full(len(o), -1, np.int64)
+            return out_t, out_i
         ri = np.concatenate(ri_all)
         ti = np.concatenate(ti_all)
-        t = mt_pairs(rv0, re1, re2, o, d, ri, ti, tmax, t_min)
-        keep = np.isfinite(t)
-        return closest_of_pairs(len(o), ri[keep], ti[keep], t[keep])
+        budget = max(1, int(self.PAIR_BUDGET))
+        for p0 in range(0, len(ri), budget):                  # same per-call cap as emission
+            sl = slice(p0, p0 + budget)
+            t = mt_pairs(rv0, re1, re2, o, d, ri[sl], ti[sl], tmax, t_min)
+            self._merge_best(out_t, out_i, ri[sl], ti[sl], t)
+        return out_t, out_i
