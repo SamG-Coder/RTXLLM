@@ -8,11 +8,14 @@
  "books": {
   "pride-1342": {
    "train_bytes": 493508,
-   "fit_s": 0.10974880000867415,
-   "build_wall_ms": 204.79860001069028,
+   "fit_and_write_s": 0.5636283000058029,
+   "scene_file_bytes": 1883780,
+   "build_wall_ms": 194.2826000013156,
    "instances": 391,
    "dishes": 96082,
    "triangles": 192164,
+   "vertex_bytes": 6917904,
+   "payload_bytes": 4326843,
    "as_bytes": 12940800,
    "splits": {
     "val": {
@@ -21,8 +24,9 @@
      "numpy_kn_bpb": 1.7737123728993425,
      "dish_parity": true,
      "max_abs_dp": 0.0,
-     "gpu_dispatch_ms": 0.05952,
-     "host_trace_wall_s": 0.02769580000312999,
+     "search_gpu_dispatch_ms": 0.057696,
+     "search_host_wall_s": 0.02331689999846276,
+     "payload_fold_host_s": 0.011655399997835048,
      "layers_hit_mean": 5.915014137516904,
      "budget_curve": {
       "1": {
@@ -63,8 +67,9 @@
      "numpy_kn_bpb": 1.7368367424451032,
      "dish_parity": true,
      "max_abs_dp": 0.0,
-     "gpu_dispatch_ms": 0.057152,
-     "host_trace_wall_s": 0.011323700004140846,
+     "search_gpu_dispatch_ms": 0.056928,
+     "search_host_wall_s": 0.011763800008338876,
+     "payload_fold_host_s": 0.01114909999887459,
      "layers_hit_mean": 5.919865338969427,
      "budget_curve": {
       "1": {
@@ -103,11 +108,14 @@
   },
   "dracula-345": {
    "train_bytes": 604405,
-   "fit_s": 0.12757240000064485,
-   "build_wall_ms": 228.88319999037776,
+   "fit_and_write_s": 1.015565499998047,
+   "scene_file_bytes": 2626221,
+   "build_wall_ms": 212.9306999995606,
    "instances": 421,
    "dishes": 135131,
    "triangles": 270262,
+   "vertex_bytes": 9729432,
+   "payload_bytes": 6063154,
    "as_bytes": 17790592,
    "splits": {
     "val": {
@@ -116,8 +124,9 @@
      "numpy_kn_bpb": 1.9367301879781482,
      "dish_parity": true,
      "max_abs_dp": 0.0,
-     "gpu_dispatch_ms": 0.07296,
-     "host_trace_wall_s": 0.1509717000008095,
+     "search_gpu_dispatch_ms": 0.073472,
+     "search_host_wall_s": 0.15090870000130963,
+     "payload_fold_host_s": 0.021031199998105876,
      "layers_hit_mean": 5.913063285665751,
      "budget_curve": {
       "1": {
@@ -158,8 +167,9 @@
      "numpy_kn_bpb": 2.0170879200817,
      "dish_parity": true,
      "max_abs_dp": 0.0,
-     "gpu_dispatch_ms": 0.072928,
-     "host_trace_wall_s": 0.01411220000591129,
+     "search_gpu_dispatch_ms": 0.071264,
+     "search_host_wall_s": 0.013934999995399266,
+     "payload_fold_host_s": 0.019488000005367212,
      "layers_hit_mean": 5.873606263705717,
      "budget_curve": {
       "1": {

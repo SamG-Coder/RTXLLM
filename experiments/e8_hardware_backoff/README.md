@@ -11,27 +11,33 @@ Layer m (contexts of the last m bytes, m = 5..0) is a plane; each training conte
 at its dyadic chaos-game position, so a context's dish contains the positions of all its extensions.
 Each (layer, newest byte) is a separate instance whose transform zooms object space ×16, keeping
 coordinates exact in float32 up to order 6. **One hardware ray per scored byte** travels through the
-stack from the query's position and meets, by real intersection, the dish of every seen suffix
-context — one hit per backoff level (≤ 6 hits). A dish's payload is its context's KN statistics
-(reflectance 1 − γ, discounted continuation counts); the host folds the hit payloads from the
-coarsest layer up, which is interpolated Kneser–Ney. No count table is consulted except through hit
-primitives. Starting the ray below the top layers is the **bounce-budget** ablation.
+stack from the query's position (computed from the query's own bytes) and meets, by real
+intersection, the dish of every seen suffix context, one hit per backoff level (at most 6 hits).
+Each dish carries a **hit-local payload** written into the scene file: its transmission gamma (KN
+backoff weight) and its sparse discounted emissions, with emissions + gamma = 1 per dish. Decoding
+reads the reloaded scene file only, with no KN object and no training counts: the host folds the
+hit dishes' payloads from the coarsest layer up, which is interpolated Kneser-Ney (tested: two
+streams with identical context support but different counts give identical geometry and different
+payloads, and the reloaded scenes reproduce KN exactly with normalised distributions). No count
+table is consulted outside the hit primitives. Starting the ray below the top layers is the **bounce-budget** ablation.
 
 ## Results (RTX 5080 / 616.64, SlangPy 0.43.1; NumPy 2.5.5)
 Exact parity on every split: hardware dish sequences = CPU suffix contexts on all layers for every
 scored byte and every bounce budget; hardware bpb = NumPy KN-6 bpb (max |Δp| = 0.0). `passes: true`.
 
-| book | split | scored bytes | RTX bpb = KN-6 | GPU dispatch | host trace wall |
-|---|---|---:|---:|---:|---:|
-| Pride (#10 pin, from offset 5) | val | 105,747 | 1.7737 | 0.060 ms | 28 ms |
-| | test | 105,747 | **1.7368** | 0.057 ms | 11 ms |
-| Dracula (#25 pin, from offset 8) | val | 129,508 | 1.9367 | 0.073 ms | 151 ms |
-| | test | 129,508 | **2.0171** | 0.073 ms | 14 ms |
+| book | split | scored bytes | RTX bpb = KN-6 | search: GPU dispatch | search: host wall | payload fold (host) |
+|---|---|---:|---:|---:|---:|---:|
+| Pride (#10 pin, from offset 5) | val | 105,747 | 1.7737 | 0.058 ms | 23 ms | 12 ms |
+| | test | 105,747 | **1.7368** | 0.057 ms | 12 ms | 11 ms |
+| Dracula (#25 pin, from offset 8) | val | 129,508 | 1.9367 | 0.073 ms | 151 ms | 21 ms |
+| | test | 129,508 | **2.0171** | 0.071 ms | 14 ms | 19 ms |
 
-Scene: Pride 96,082 dishes / 192,164 triangles / 391 instances, 12.9 MB acceleration structures,
-205 ms build; Dracula 135,131 / 270,262 / 421, 17.8 MB, 229 ms. KN fit 0.11–0.13 s (CPU).
-GPU dispatch times are single-dispatch timestamps for all scored positions; host wall includes
-upload/readback.
+The GPU dispatch time covers the suffix search only (all scored positions in one dispatch). Host
+wall times include upload and readback; the payload fold runs on the CPU afterwards.
+
+Scene (Pride / Dracula): 96,082 / 135,131 dishes; 192,164 / 270,262 triangles in 391 / 421
+instances; vertices 6.9 / 9.7 MB; hit-local payloads 4.3 / 6.1 MB; compressed scene file
+1.9 / 2.6 MB; acceleration structures 12.9 / 17.8 MB; build about 0.2 s.
 
 **Bounce budget** (ray meets only the bottom b layers; test bpb; lower is better). Definition: the
 ray is launched *below* the top 6 - b layers, i.e. the **oldest context bytes are dropped before

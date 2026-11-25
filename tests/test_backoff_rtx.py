@@ -24,7 +24,7 @@ def test_layered_rtx_equals_kneser_ney():
     tr, ev = TEXT[:900], TEXT[900:]
     for order in (1, 4, 6):
         kn = KneserNey(order).fit([tr])
-        sc = backoff.LayeredScene(device, kn)
+        sc = backoff.LayeredScene(device, backoff.write_scene(kn))
         idx = np.arange(order - 1, len(ev))
         pts = sc.points(ev, idx)
         d, _ = sc.trace(kernel, pts)
@@ -40,7 +40,7 @@ def test_order_limit():
     backoff = _rtx()
     device, _ = backoff.open_backoff_kernel()
     with pytest.raises(ValueError):
-        backoff.LayeredScene(device, KneserNey(7).fit([TEXT]))
+        backoff.write_scene(KneserNey(7).fit([TEXT]))
 
 
 def test_oldest_high_byte_selects_distinct_dishes_and_unseen_reaches_suffix():
@@ -53,7 +53,7 @@ def test_oldest_high_byte_selects_distinct_dishes_and_unseen_reaches_suffix():
     b_ = bytes([0xFF]) + b"abcd" + b"y"
     train = np.frombuffer((a + b" " + b_ + b" ") * 3, np.uint8).astype(np.int64)
     kn = KneserNey(6).fit([train])
-    sc = backoff.LayeredScene(device, kn)
+    sc = backoff.LayeredScene(device, backoff.write_scene(kn))
     q = np.frombuffer(a + b_ + bytes([0x81]) + b"abcd" + b"z", np.uint8).astype(np.int64)
     idx = np.array([5, 11, 17])              # targets x, y, z with 5-byte contexts
     d, _ = sc.trace(kernel, sc.points(q, idx))
@@ -63,3 +63,29 @@ def test_oldest_high_byte_selects_distinct_dishes_and_unseen_reaches_suffix():
     assert d[2, 1] >= 0 and d[2, 1] == d[0, 1] == d[1, 1]           # ... but 'abcd' is reached
     p = sc.target_prob(d, q[idx])
     assert np.allclose(p, kn.prob(q, start=0)[idx], atol=1e-12)
+
+
+def test_decoding_uses_only_scene_payloads(tmp_path):
+    """Codex's #36 case: same context support, different counts -> identical geometry,
+    different hit-local payloads; decoding from the reloaded file needs no KN object."""
+    backoff = _rtx()
+    device, kernel = backoff.open_backoff_kernel()
+    s1 = np.frombuffer(b"ab" * 90 + b"ac" * 10, np.uint8).astype(np.int64)
+    s2 = np.frombuffer(b"ab" * 10 + b"ac" * 90, np.uint8).astype(np.int64)
+    q = np.frombuffer(b"ab", np.uint8).astype(np.int64)
+    probs = []
+    for i, data in enumerate((s1, s2)):
+        kn = KneserNey(2).fit([data])
+        w = backoff.write_scene(kn)
+        backoff.save(tmp_path / f"s{i}.npz", w)
+        ref = kn.prob(q, start=1)[0]
+        del kn                                  # decode below must not depend on it
+        sc = backoff.LayeredScene(device, backoff.load(tmp_path / f"s{i}.npz"))
+        d, _ = sc.trace(kernel, sc.points(q, np.array([1])))
+        p = sc.target_prob(d, q[1:2])[0]
+        assert abs(p - ref) < 1e-12
+        dist = sc.distribution(d[0])
+        assert abs(dist.sum() - 1) < 1e-12 and np.all(dist > 0)
+        probs.append((w["vertices"], p))
+    assert np.array_equal(probs[0][0], probs[1][0])          # same geometry (same support)
+    assert probs[0][1] > 0.8 and probs[1][1] < 0.2             # payloads carry the difference

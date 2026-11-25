@@ -21,7 +21,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src" / "rtx"))
 sys.path.insert(0, str(ROOT / "src"))
-from backoff import LayeredScene, open_backoff_kernel  # noqa: E402
+from backoff import LayeredScene, load, open_backoff_kernel, save, write_scene  # noqa: E402
 
 from rtxllm.baselines.ngram import KneserNey  # noqa: E402
 
@@ -50,23 +50,31 @@ def main():
         tr, va, te = splits(folder / f"rtxllm-{name}.txt", digest)
         t0 = perf_counter()
         kn = KneserNey(ORDER).fit([tr])
+        written = write_scene(kn)
         fit_s = perf_counter() - t0
-        scene = LayeredScene(device, kn)
-        book = {"train_bytes": len(tr), "fit_s": fit_s, **scene.metrics, "splits": {}}
+        path = Path(__file__).resolve().parent / f"scene_{name}.npz"   # not committed (large)
+        save(path, written)
+        # Decode strictly from the reloaded scene file: no KN object, no training counts.
+        scene = LayeredScene(device, load(path))
+        book = {"train_bytes": len(tr), "fit_and_write_s": fit_s, "scene_file_bytes": path.stat().st_size,
+                **scene.metrics, "splits": {}}
         for split, data in (("val", va), ("test", te)):
             idx = np.arange(start, len(data))
             pts = scene.points(data, idx)
             t0 = perf_counter()
             dishes, gpu_ms = scene.trace(kernel, pts)
-            wall = perf_counter() - t0
-            exp = scene.expected_dishes(data, idx)
+            search_wall = perf_counter() - t0
+            t0 = perf_counter()
             p = scene.target_prob(dishes, data[idx])
-            ref = kn.prob(data, start=start)
+            fold_wall = perf_counter() - t0
+            exp = scene.expected_dishes(data, idx)
+            ref = kn.prob(data, start=start)       # independent NumPy KN, used only for comparison
             row = {"scored": len(idx), "rtx_bpb": float(-np.log2(p).mean()),
                    "numpy_kn_bpb": float(-np.log2(ref).mean()),
                    "dish_parity": bool(np.array_equal(dishes, exp)),
                    "max_abs_dp": float(np.abs(p - ref).max()),
-                   "gpu_dispatch_ms": gpu_ms, "host_trace_wall_s": wall,
+                   "search_gpu_dispatch_ms": gpu_ms, "search_host_wall_s": search_wall,
+                   "payload_fold_host_s": fold_wall,
                    "layers_hit_mean": float((dishes >= 0).sum(1).mean()),
                    "budget_curve": {}}
             for b in range(1, ORDER + 1):
