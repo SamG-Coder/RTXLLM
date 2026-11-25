@@ -1,0 +1,69 @@
+{
+  "queries": 2048,
+  "with_station": 1789,
+  "archive_sha256": "3fb8e3c8dc27bac43ebd60c66d07f7c24edd88f1d9a539e98c1d512678c7ba70",
+  "gpu": "NVIDIA GeForce RTX 5080",
+  "learned": {
+    "correct": 171,
+    "first_hits": 43920,
+    "eligible_receiver_hits": 43920,
+    "queries_with_receiver": 1559,
+    "accuracy": 0.08349609375,
+    "learned_only_correct": 0,
+    "comparator_only_correct": 0
+  },
+  "shuffled_layout": {
+    "correct": 185,
+    "first_hits": 42294,
+    "eligible_receiver_hits": 42294,
+    "queries_with_receiver": 1547,
+    "accuracy": 0.09033203125,
+    "learned_only_correct": 16,
+    "comparator_only_correct": 30
+  },
+  "shuffled_tilt": {
+    "correct": 13,
+    "first_hits": 43920,
+    "eligible_receiver_hits": 22284,
+    "queries_with_receiver": 1006,
+    "accuracy": 0.00634765625,
+    "learned_only_correct": 166,
+    "comparator_only_correct": 8
+  },
+  "nearest": {
+    "correct": 194,
+    "accuracy": 0.0947265625,
+    "learned_only_correct": 9,
+    "comparator_only_correct": 32
+  },
+  "exact_weighted": {
+    "correct": 217,
+    "accuracy": 0.10595703125,
+    "learned_only_correct": 21,
+    "comparator_only_correct": 67
+  },
+  "recent": {
+    "correct": 22,
+    "accuracy": 0.0107421875,
+    "learned_only_correct": 160,
+    "comparator_only_correct": 11
+  },
+  "frequent": {
+    "correct": 98,
+    "accuracy": 0.0478515625,
+    "learned_only_correct": 106,
+    "comparator_only_correct": 33
+  },
+  "recent_eligible": {
+    "correct": 22,
+    "accuracy": 0.0107421875,
+    "learned_only_correct": 157,
+    "comparator_only_correct": 8
+  },
+  "frequent_eligible": {
+    "correct": 93,
+    "accuracy": 0.04541015625,
+    "learned_only_correct": 105,
+    "comparator_only_correct": 27
+  }
+}
