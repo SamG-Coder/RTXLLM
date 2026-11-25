@@ -49,15 +49,52 @@ def written_sample(world, n=300, seed=0):
     return [keys[i] for i in sorted(rng.choice(len(keys), size=n, replace=False))]
 
 
-def beam_eval(world, pos, dish, width, split, two_hop=True):
+_RTX = {}
+
+
+def rtx_context():
+    """Lazily open the RTX device (only for --backend rtx)."""
+    if not _RTX:
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src" / "rtx"))
+        from beam import BeamRTX, open_kernel
+        _RTX["device"], _RTX["kernel"] = open_kernel("beam.slang")
+        _RTX["cls"] = BeamRTX
+    return _RTX
+
+
+class _Checked:
+    """RTX tracer that re-traces a subset on the CPU reference and records parity."""
+
+    def __init__(self, cpu, parity_limit):
+        ctx = rtx_context()
+        self.cpu, self.gpu, self.limit = cpu, ctx["cls"](ctx["device"], ctx["kernel"], cpu), parity_limit
+        self.parity = []
+
+    def trace(self, starts, programs):
+        g = self.gpu.trace(starts, programs)
+        n = len(starts) if self.limit is None else min(self.limit, len(starts))
+        c = self.cpu.trace(starts[:n], programs[:n])
+        self.parity.append({"queries_checked": n, "of": len(starts),
+                            "max_answer_diff": float(np.abs(c.answer - g.answer[:n]).max()),
+                            "max_lost_diff": float(np.abs(c.lost - g.lost[:n]).max()),
+                            "pred_agreement": float(np.mean(c.predict() == g.predict()[:n]))})
+        return g
+
+
+def beam_eval(world, pos, dish, width, split, two_hop=True, backend="cpu"):
     geom = GeometryConfig(receiver_radius=RECEIVER, fact_radius=FACET, dish_radius=dish)
     scene = build_scene(world.with_positions(pos), geom)
     bt = BeamTracer(scene, BeamParams(width=width, core=CORE if width > 0 else 1.0, rays=RAYS,
                                       fact_distance=geom.fact_distance))
-    out = {"triangles": scene.n_triangles}
+    out = {"triangles": scene.n_triangles, "backend": backend}
+    if backend == "rtx":
+        bt_one = _Checked(bt, None)       # single-hop sets: full CPU parity
+        bt_two = _Checked(bt, 50)         # two-hop: CPU parity on the first 50 queries
+    else:
+        bt_one = bt_two = bt
     held = world.heldout[split]
     t0 = time.perf_counter()
-    r = bt.trace([s for s, _ in held], [(x,) for _, x in held])
+    r = bt_one.trace([s for s, _ in held], [(x,) for _, x in held])
     out["seconds_heldout"] = time.perf_counter() - t0
     gold = np.array([world.truth[k] for k in held])
     pred = r.predict()
@@ -66,7 +103,7 @@ def beam_eval(world, pos, dish, width, split, two_hop=True):
     out["heldout_lost_energy"] = float(r.lost.mean())
     out["rays_per_query"] = r.rays / len(held)
     ws = written_sample(world, seed=world.config.seed)
-    rw = bt.trace([s for s, _ in ws], [(x,) for _, x in ws])
+    rw = bt_one.trace([s for s, _ in ws], [(x,) for _, x in ws])
     wgold = np.array([world.written[k][0] for k in ws])
     wp = rw.predict()
     exc = np.array([world.truth[k] != world.prototype[world.cluster[k[0]], k[1]] for k in ws])
@@ -75,9 +112,11 @@ def beam_eval(world, pos, dish, width, split, two_hop=True):
     if two_hop:
         th = world.two_hop[split]
         t0 = time.perf_counter()
-        r2 = bt.trace([s for s, *_ in th], [(r1, r2_) for _, r1, r2_, _ in th])
+        r2 = bt_two.trace([s for s, *_ in th], [(r1, r2_) for _, r1, r2_, _ in th])
         out["seconds_two_hop"] = time.perf_counter() - t0
         out["two_hop_acc"] = float(np.mean(r2.predict() == np.array([g for *_, g in th])))
+    if backend == "rtx":
+        out["rtx_cpu_parity"] = bt_one.parity + bt_two.parity
     return out
 
 
@@ -147,15 +186,15 @@ def sweep():
                                                     "selected_k": kbest}, indent=1))
 
 
-def test(dish, width, k):
+def test(dish, width, k, backend="cpu"):
     res = {}
     for seed in SEEDS:
         world = generate_clustered(ClusterConfig(seed=seed))
         lay = layouts(world, seed)
         row = {"layout_quality": {n: layout_quality(v, world.cluster) for n, v in lay.items()}}
         for name, pos in lay.items():
-            row[f"beam_{name}"] = beam_eval(world, pos, dish, width, "test")
-            row[f"pencil_{name}"] = beam_eval(world, pos, dish, 0.0, "test")
+            row[f"beam_{name}"] = beam_eval(world, pos, dish, width, "test", backend=backend)
+            row[f"pencil_{name}"] = beam_eval(world, pos, dish, 0.0, "test", backend=backend)
             row[f"knn_{name}"] = knn_eval(world, pos, k, "test")
         row["cluster_majority"] = cluster_majority(world, "test")
         row["graph_written_only"] = {"heldout_acc": 0.0, "note": "held-out facts are not written; abstains"}
@@ -175,7 +214,14 @@ def test(dish, width, k):
     for c in checks:
         print(("PASS " if c[1] else "FAIL ") + c[0], c[2])
     OUT.mkdir(exist_ok=True)
-    (OUT / f"test_dish{dish}_w{width}_k{k}.json").write_text(json.dumps(
+    parity = [p for row in res.values() for v in row.values() if isinstance(v, dict)
+              for p in v.get("rtx_cpu_parity", [])]
+    if parity:
+        worst = max(p["max_answer_diff"] for p in parity)
+        agree = min(p["pred_agreement"] for p in parity)
+        print(f"RTX vs CPU parity over {len(parity)} checked sets: max answer diff {worst:.2e}, "
+              f"min prediction agreement {agree:.4f}")
+    (OUT / f"test_dish{dish}_w{width}_k{k}_{backend}.json").write_text(json.dumps(
         {"env": env(), "results": res, "acceptance": [(c, bool(o), v) for c, o, v in checks],
          "config": {"dish": dish, "width": width, "knn_k": k, "facet": FACET, "receiver": RECEIVER,
                     "rays": RAYS, "core": CORE}}, indent=1, default=float))
@@ -187,8 +233,10 @@ def main():
     ap.add_argument("--dish", type=float)
     ap.add_argument("--width", type=float)
     ap.add_argument("--knn", type=int)
+    ap.add_argument("--backend", choices=("cpu", "rtx"), default="cpu",
+                    help="rtx: hardware traces, re-checked against the CPU reference")
     a = ap.parse_args()
-    sweep() if a.split == "sweep" else test(a.dish, a.width, a.knn)
+    sweep() if a.split == "sweep" else test(a.dish, a.width, a.knn, a.backend)
 
 
 if __name__ == "__main__":
