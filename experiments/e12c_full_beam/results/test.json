@@ -1,0 +1,79 @@
+{
+ "kn": {
+  "ppl": 82.26318151392445,
+  "ppl_unseen": 2430.946970831893,
+  "ppl_seen": 34.32113319299578,
+  "unseen_frac": 0.2051891891891892
+ },
+ "beam_full_disc": {
+  "ppl": 79.5794506739868,
+  "ppl_unseen": 2089.3849119224997,
+  "ppl_seen": 34.2305801817621,
+  "unseen_frac": 0.2051891891891892,
+  "own_hit_frac": 0.006919974035608309,
+  "ray_hit_frac": 0.16969236832344214,
+  "rays": 862720,
+  "gpu_ms": 0.04672,
+  "cpu_parity_rays": 32768,
+  "cpu_parity": 1.0,
+  "setting": "beam_s1.0_l0.2"
+ },
+ "beam_shuffled_payload": {
+  "ppl": 91.89956710928216,
+  "ppl_unseen": 2479.4329195774376,
+  "ppl_seen": 39.25319113646874,
+  "unseen_frac": 0.2051891891891892,
+  "own_hit_frac": 0.006919974035608309,
+  "ray_hit_frac": 0.16969236832344214,
+  "rays": 862720,
+  "gpu_ms": 0.047776,
+  "cpu_parity_rays": 32768,
+  "cpu_parity": 1.0
+ },
+ "beam_random_layout": {
+  "ppl": 85.15537199524182,
+  "ppl_unseen": 2309.464988883674,
+  "ppl_seen": 36.323693094968085,
+  "unseen_frac": 0.2051891891891892,
+  "own_hit_frac": 0.007033568249258161,
+  "ray_hit_frac": 0.4626982103115727,
+  "rays": 862720,
+  "gpu_ms": 0.059904,
+  "cpu_parity_rays": 32768,
+  "cpu_parity": 1.0
+ },
+ "class_highD": {
+  "ppl": 79.45393538800576,
+  "ppl_unseen": 2009.1321789665512,
+  "ppl_seen": 34.50984952003028,
+  "unseen_frac": 0.2051891891891892,
+  "setting": "class_highD_K100_l0.2"
+ },
+ "class_3D": {
+  "ppl": 79.65037956263703,
+  "ppl_unseen": 2022.268441513216,
+  "ppl_seen": 34.55904175007542,
+  "unseen_frac": 0.2051891891891892,
+  "setting": "class_3D_K100_l0.2"
+ },
+ "kernel_self": {
+  "ppl": 78.93089565001237,
+  "ppl_unseen": 2174.0215253829756,
+  "ppl_seen": 33.53441906633177,
+  "unseen_frac": 0.2051891891891892,
+  "setting": "kernel_self_s1.0_l0.3"
+ },
+ "knn_self": {
+  "ppl": 79.58774113215995,
+  "ppl_unseen": 2054.7227288315253,
+  "ppl_seen": 34.38323857555947,
+  "unseen_frac": 0.2051891891891892,
+  "setting": "knn_self_k10_l0.2"
+ },
+ "criterion": {
+  "beam_vs_best_comparator": -0.008216744769376172,
+  "random_layout_worse_by": 0.07006735123239172,
+  "shuffled_payload_worse_by": 0.1548152988108349
+ },
+ "passes": false
+}
