@@ -50,4 +50,11 @@ bigrams and kNN (within 0.2%).
   hurts badly. But on matched comparison (ADR 0003 c) it is a class-based smoother that a dense
   Gaussian kernel over the same coordinates slightly beats. Occlusion and finite ray sampling
   appear to cost a little rather than help.
+- **Post-hoc, validation only** (`posthoc_occlusion.py REPO_ROOT BOOK_DIR`, run after the sealed test;
+  no test numbers): nearest-hit occlusion *costs* accuracy. With transmission γ per dish crossed
+  (exact CPU all-hit lists; γ = 0 reproduces the RTX closest-hit numbers exactly), validation
+  perplexity at λ 0.2 is 80.67 (γ 0), 80.50 (0.25), 80.37 (0.5), 80.25 (1.0); the best is 80.14 at
+  γ 1, λ 0.3. That approaches the self-inclusive kernel (79.88). Ray count does not limit it: 512
+  vs 2,048 rays give 80.67 vs 80.65. So the closest-hit selection that makes this T-class is what
+  separates it from the kernel.
 - One book, one layout seed, bigram only. No traversal advantage is claimed.
