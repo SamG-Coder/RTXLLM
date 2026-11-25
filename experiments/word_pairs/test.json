@@ -1,0 +1,37 @@
+{
+  "model_sha256": "3fb8e3c8dc27bac43ebd60c66d07f7c24edd88f1d9a539e98c1d512678c7ba70",
+  "pair_sha256": "845c1d0f462b8466692f598095432262b82af0cb4c2860713958e0409a7d6cfa",
+  "targets": 33377,
+  "unseen_pairs": 7885,
+  "donor_coverage": 0.6300146807681937,
+  "pair_stations": 36965,
+  "pair_as_bytes": 6837248,
+  "one_word": {
+    "all": 92.80755070550735,
+    "unseen_pair": 125.11374887276367,
+    "seen_pair": 84.6172156486695
+  },
+  "exact": {
+    "all": 137.58628681630978,
+    "unseen_pair": 125.11374887276367,
+    "seen_pair": 141.6904309165074
+  },
+  "witten_bell_pair": {
+    "all": 115.10772707722504,
+    "unseen_pair": 125.11374887276367,
+    "seen_pair": 112.17786879796884
+  },
+  "selected": 0.1,
+  "donors": {
+    "all": 134.55266007440656,
+    "unseen_pair": 127.14969527102568,
+    "seen_pair": 136.9286277808215
+  },
+  "shuffled_older": {
+    "all": 121.19424184368063,
+    "unseen_pair": 149.52500282958164,
+    "seen_pair": 113.56978908953684
+  },
+  "relative_gain": 0.02204890336166565,
+  "meets_threshold": true
+}
