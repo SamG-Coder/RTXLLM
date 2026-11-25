@@ -177,13 +177,42 @@ class BeamTracer:
             E = newE
         return BeamResult(E, lost, rays, mhit, rec)
 
+    PAIR_BUDGET = 8_000_000   # (ray, triangle) pairs per Moller-Trumbore flush
+
+    @staticmethod
+    def _merge_best(out_t, out_i, ri, ti, t):
+        """Fold candidate hits into the running closest hit (ties -> lowest tri)."""
+        keep = np.isfinite(t)
+        ri, ti, t = ri[keep], ti[keep], t[keep]
+        if len(ri) == 0:
+            return
+        bt, bi = closest_of_pairs(len(out_t), ri, ti, t)
+        rows = np.flatnonzero(bi >= 0)
+        better = (bt[rows] < out_t[rows]) | ((bt[rows] == out_t[rows]) & (bi[rows] < out_i[rows]))
+        r = rows[better]
+        out_t[r], out_i[r] = bt[r], bi[r]
+
     def _emit_broadphase(self, xs, d, B, org, dirs, tmax, t_min, fv0, fe1, fe2, fcen, frad, reach):
-        """Candidates per beam: facts whose bounding sphere meets the beam cylinder."""
+        """Candidates per beam: facts whose bounding sphere meets the beam cylinder.
+        Pairs are flushed in bounded batches, so memory stays O(PAIR_BUDGET)."""
         sc = self.scene
         axis0 = sc.station_pos[xs] - self.span * d            # [nb, 3]
-        w = float(np.abs(self.offsets).max()) if len(self.offsets) else 0.0
-        w = max(w, float(np.linalg.norm(self.offsets, axis=1).max()))
-        ri_all, ti_all = [], []
+        w = float(np.linalg.norm(self.offsets, axis=1).max()) if len(self.offsets) else 0.0
+        out_t = np.full(len(org), np.inf, np.float32)
+        out_i = np.full(len(org), -1, np.int64)
+        pend_b, pend_f, pend_n = [], [], 0
+
+        def flush():
+            nonlocal pend_b, pend_f, pend_n
+            if not pend_b:
+                return
+            bi, fi = np.concatenate(pend_b), np.concatenate(pend_f)
+            ri = (bi[:, None] * B + np.arange(B)[None]).reshape(-1)
+            ti = np.repeat(fi, B)
+            t = mt_pairs(fv0, fe1, fe2, org, dirs, ri, ti, tmax, t_min)
+            self._merge_best(out_t, out_i, ri, ti, t)
+            pend_b, pend_f, pend_n = [], [], 0
+
         for a in range(0, len(xs), 64):
             b = min(len(xs), a + 64)
             rel = fcen[None] - axis0[a:b, None]               # [nb, F, 3]
@@ -191,21 +220,16 @@ class BeamTracer:
             perp = np.linalg.norm(rel - depth[..., None] * d, axis=-1)
             cand = (perp <= w + frad[None] + 1e-4) & (depth >= -frad[None] - 1e-4) & (depth <= reach + frad[None] + 1e-4)
             bi, fi = np.nonzero(cand)
-            if len(bi) == 0:
-                continue
-            # every ray of beam bi against facet fi
-            bi_g = bi + a
-            ri = (bi_g[:, None] * B + np.arange(B)[None]).reshape(-1)
-            ti = np.repeat(fi, B)
-            ri_all.append(ri)
-            ti_all.append(ti)
-        if not ri_all:
-            return np.full(len(org), np.inf, np.float32), np.full(len(org), -1, np.int64)
-        ri = np.concatenate(ri_all)
-        ti = np.concatenate(ti_all)
-        t = mt_pairs(fv0, fe1, fe2, org, dirs, ri, ti, tmax, t_min)
-        keep = np.isfinite(t)
-        return closest_of_pairs(len(org), ri[keep], ti[keep], t[keep])
+            # split so that each pending batch stays within the pair budget
+            step = max(1, self.PAIR_BUDGET // B)
+            for c0 in range(0, len(bi), step):
+                pend_b.append(bi[c0:c0 + step] + a)
+                pend_f.append(fi[c0:c0 + step])
+                pend_n += min(step, len(bi) - c0) * B
+                if pend_n >= self.PAIR_BUDGET:
+                    flush()
+        flush()
+        return out_t, out_i
 
     def _receiver_broadphase(self, o, d, tmax, t_min):
         """Candidates: receivers whose bounding sphere the ray segment can touch."""
