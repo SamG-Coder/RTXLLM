@@ -31,10 +31,11 @@ Parity is exact at every size: RTX dish hits = CPU suffix contexts; RTX bpb = Nu
 - **Host transfer/synchronisation dominates search** (~40 ms, >99% of search wall time: per-call
   buffer creation, upload, sync and readback), and the **CPU payload fold** costs more than the
   search (58–67 ms).
-- **Honest speed comparison:** the GPU dispatch is ~400× faster than a NumPy sorted-key suffix
-  search over the same positions (65–79 ms). End to end, with the current host path, RTX search
-  plus CPU fold (~100–110 ms) is about 1.7× *slower* than full NumPy KN scoring (0.16–0.19 s
-  ÷ ... see results.json) — no end-to-end speed advantage is claimed.
+- **Honest speed comparison:** the GPU dispatch alone is ~400× faster than a NumPy sorted-key suffix
+  search over the same positions (65–79 ms). End to end with the current host path, RTX search plus
+  CPU fold takes 0.10–0.11 s against 0.16–0.19 s for full NumPy KN scoring (single-threaded NumPy,
+  1.6–1.8× faster). That margin is modest and would shrink against an optimised multi-threaded CPU
+  index, so no general speed advantage is claimed.
 - Memory grows linearly with distinct contexts; acceleration structures cost ~2.7× the vertex bytes.
 - Next steps (not in this PR): persistent device buffers, and the GPU payload fold from #41, which
   should remove both host costs.
