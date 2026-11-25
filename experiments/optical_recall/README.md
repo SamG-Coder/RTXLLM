@@ -9,8 +9,12 @@ The learned predecessor layout recalled 171 of 2,048 unfamiliar spellings on the
 | Shuffled tilt assignments | 13 | 0.63% |
 | Nearest predecessor position | 194 | 9.47% |
 | E19-style predecessor weighting | 217 | 10.60% |
+| Most recent unfamiliar spelling | 22 | 1.07% |
+| Most frequent unfamiliar spelling, ties by recency | 98 | 4.79% |
 
-Each query is conditional on the target being outside the frozen Pride vocabulary. All methods see the same preceding 64 unfamiliar-word occurrences. Only predecessors with a dish in E14 participate. Of the 2,048 queries, 1,789 had a predecessor station and 1,559 received an optical vote in the learned layout. Missing predictions count as incorrect. The exact comparator gives each episode weight 8 for a matching predecessor and 1 otherwise. All methods break tied spelling votes by recency. The JSON records paired disagreements.
+The last two controls can use all past unfamiliar spellings in the window, even where the predecessor has no E14 dish. Restricting them to the exact eligible queries and candidates available to the optical selector gives 22 and 93 correct respectively. The optical selector improves on both simple cache rules. It still falls behind the nearest-position and exact-predecessor controls.
+
+Each query is conditional on the target being outside the frozen Pride vocabulary. All methods see the same preceding 64 unfamiliar-word occurrences. The optical selector and its original matched comparators require predecessors with a dish in E14. Of the 2,048 queries, 1,789 had a predecessor station and 1,559 received an optical vote in the learned layout. Missing predictions count as incorrect. The exact comparator gives each episode weight 8 for a matching predecessor and 1 otherwise. All methods break tied spelling votes by recency. The JSON records paired disagreements.
 
 **Traversal (T).** Each episode owns a mirror at its predecessor’s projected position. Age sets its depth. Thirty-two parallel rays from the query station compete for the closest surfaces. Each first hit reflects using its triangle normal and hit point. A second Vulkan ray query intersects the receiver plane at x=2048. Source and receiver ranks differ by a fixed permutation within each 64-row block. For the intended routing all 43,920 first hits reached their assigned receiver. Shuffling the tilt offsets changed which receiver the reflected rays reached. The second segment transports the first-stage selection to its assigned band. **Addressed storage (S).** The host reads the historical spelling of the intersected receiver and sums one vote per ray.
 

@@ -41,5 +41,29 @@
     "accuracy": 0.10595703125,
     "learned_only_correct": 21,
     "comparator_only_correct": 67
+  },
+  "recent": {
+    "correct": 22,
+    "accuracy": 0.0107421875,
+    "learned_only_correct": 160,
+    "comparator_only_correct": 11
+  },
+  "frequent": {
+    "correct": 98,
+    "accuracy": 0.0478515625,
+    "learned_only_correct": 106,
+    "comparator_only_correct": 33
+  },
+  "recent_eligible": {
+    "correct": 22,
+    "accuracy": 0.0107421875,
+    "learned_only_correct": 157,
+    "comparator_only_correct": 8
+  },
+  "frequent_eligible": {
+    "correct": 93,
+    "accuracy": 0.04541015625,
+    "learned_only_correct": 105,
+    "comparator_only_correct": 27
   }
 }

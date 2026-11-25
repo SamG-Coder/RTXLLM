@@ -196,14 +196,26 @@ def main():
             eligible_receiver_hits=int((received >= 0).sum()),
             queries_with_receiver=int((received >= 0).any(axis=1).sum()),
         )
-    for mode in ("nearest", "exact_weighted"):
+    for mode in (
+        "nearest",
+        "exact_weighted",
+        "recent",
+        "frequent",
+        "recent_eligible",
+        "frequent_eligible",
+    ):
         results = []
         for i in range(len(words)):
             rows = np.arange(max(0, i - WINDOW), i)[::-1]
-            rows = rows[eligible[rows]] if eligible[i] else rows[:0]
+            if mode not in ("recent", "frequent"):
+                rows = rows[eligible[rows]] if eligible[i] else rows[:0]
             if mode == "nearest" and len(rows):
                 rows = rows[[np.argmin(np.linalg.norm(xy[rows] - xy[i], axis=1))]]
-            weights = np.where(context[rows] == context[i], 8, 1)
+            if mode.startswith("recent"):
+                rows = rows[:1]
+            weights = np.ones(len(rows), int)
+            if mode == "exact_weighted":
+                weights[context[rows] == context[i]] = 8
             results.append(vote(words, rows, weights) == words[i])
         positive[mode] = np.array(results)
         report[mode] = dict(correct=int(sum(results)))
