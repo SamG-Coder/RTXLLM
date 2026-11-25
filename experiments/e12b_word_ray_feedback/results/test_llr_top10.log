@@ -1,0 +1,4 @@
+NVIDIA GeForce RTX 5080
+feedback round 120: {"ppl": 82.862, "ppl_unseen": 2197.915, "ppl_seen": 35.549, "unseen_frac": 0.205}
+shuffled round 120: {"ppl": 85.185, "ppl_unseen": 2294.615, "ppl_seen": 36.4, "unseen_frac": 0.205}
+KN: {'ppl': 82.26318151392445, 'ppl_unseen': 2430.946970831893, 'ppl_seen': 34.32113319299578, 'unseen_frac': 0.2051891891891892}
