@@ -50,10 +50,11 @@ class Memory:
         offsets = np.array(
             [[-0.375, -0.25, 0], [0.375, -0.25, 0], [0, 0.375, 0]], np.float32
         )
-        self.scene = WordRTX(
-            self.device, self.search, WordScene(centers[:, None] + offsets)
-        )
-        self.width = int(widths.max())
+        self.install(centers[:, None] + offsets, int(widths.max()))
+
+    def install(self, vertices, width):
+        self.scene = WordRTX(self.device, self.search, WordScene(vertices))
+        self.width = width
 
     def counts(self, words, delay, predecessors=None):
         starts = np.r_[0, np.cumsum([len(w) for w in words])].astype(np.uint32)

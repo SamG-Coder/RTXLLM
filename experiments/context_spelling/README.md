@@ -20,3 +20,17 @@ Use the [E17 archives](../word_spelling/README.md), the same three digest-checke
 python experiments/context_spelling/route.py test words.npz spelling.npz --books BOOK_DIRECTORY --report results.json
 python experiments/context_spelling/route.py generate words.npz spelling.npz --prompt "the qzz89 and qzz23 the qzz89 and qzz23 the" --count 512 --seed 73
 ~~~
+
+## Save a word session
+
+Start from a prompt, append observed text, or resume a saved sequence. The model archive and spelling archive must match the SHA-256 digests recorded in the session. Each command publishes a new checkpoint and prints the generated tokens as hex plus their copy flags. Count zero records observations without sampling.
+
+~~~sh
+python experiments/context_spelling/session.py words.npz spelling.npz first.npz --prompt "the qzz89 and qzz23 the" --seed 73 --count 128
+python experiments/context_spelling/session.py words.npz spelling.npz second.npz --resume first.npz --observe further.txt --count 128
+python experiments/context_spelling/check_session.py words.npz spelling.npz
+~~~
+
+Each observation is tokenized as a separate segment of complete tokens. The previous word and the 64-occurrence window carry across the segment boundary. Splitting a single word between calls therefore changes the observed tokens. The archive stores the current GPU vertex buffer, previous word ID, RNG state, format version and both model digests. Restore rebuilds the acceleration structure and reads each historical record from geometry before continuing. The writer uses a complete staged file and publishes it with a hard link, preserving any checkpoint already at the destination.
+
+On RTX 5080 the 512-token run agreed with fresh-process continuations split at token 137 and immediately after token 479, where qzz89 was copied. Every token and copy flag matched the original one-shot E19 implementation. The empty checkpoint occupied 1,516 compressed bytes. A checkpoint with 64 rows of test spellings occupied 5,472 bytes. The boundary check also verifies that the most recent 64 rows survive eviction, the predecessor of the first appended spelling survives restart, both model identities are checked, and an attempted overwrite preserves the existing checkpoint.
