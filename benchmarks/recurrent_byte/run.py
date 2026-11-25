@@ -64,17 +64,21 @@ class Predictor(nn.Module):
         self.gru = nn.GRU(64, 192, batch_first=True)
         self.head = nn.Linear(192, 256)
 
-    def forward(self, x):
-        hidden, _ = self.gru(self.embedding(x.long()))
-        return self.head(hidden).flatten(0, 1)
+    def forward(self, x, state=None):
+        hidden, state = self.gru(self.embedding(x.long()), state)
+        return self.head(hidden).flatten(0, 1), state
 
 
 @torch.inference_mode()
-def score(model, data, batch):
+def score(model, data, batch, *, carry):
     x, y = data
+    state = None
     total = torch.zeros((), device="cuda", dtype=torch.float64)
     for start in range(0, len(x), batch):
-        logits = model(x[start : start + batch])
+        inputs = x[start : start + batch]
+        if carry:
+            inputs = inputs.reshape(1, -1)
+        logits, state = model(inputs, state if carry else None)
         losses = F.cross_entropy(
             logits, y[start : start + batch].flatten(), reduction="none"
         )
@@ -105,18 +109,25 @@ def main():
         best = math.inf
         history = []
         start = perf_counter()
-        for epoch in range(1, 7):
+        anchor = math.inf
+        last_improvement = 0
+        for epoch in range(1, 101):
             for idx in torch.randperm(len(x), device="cuda").split(64):
                 optimizer.zero_grad(set_to_none=True)
-                F.cross_entropy(model(x[idx]), y[idx].flatten()).backward()
+                logits, _ = model(x[idx])
+                F.cross_entropy(logits, y[idx].flatten()).backward()
                 optimizer.step()
-            observed = score(model, val, 64)
+            observed = score(model, val, 8, carry=True)
             history.append(observed["bpb"])
             if history[-1] < best:
                 best = history[-1]
                 report["selected_epoch"] = epoch
                 torch.save(model.state_dict(), checkpoint)
             print(epoch, history[-1], flush=True)
+            if best < anchor - 0.001:
+                anchor, last_improvement = best, epoch
+            if epoch - last_improvement >= 8:
+                break
         report.update(
             train_targets=int((y != IGNORE).sum()),
             val_targets=observed["targets"],
@@ -127,11 +138,13 @@ def main():
         model.load_state_dict(torch.load(checkpoint, weights_only=True))
         for name, digest in TEST.items():
             data = dataset(args.books, {name: digest}, 8)
-            result = score(model, data, 64)
-            repeat = score(model, data, 13)
+            result = score(model, data, 8, carry=True)
+            repeat = score(model, data, 13, carry=True)
             if abs(result["bpb"] - repeat["bpb"]) > 1e-6:
                 raise AssertionError("Evaluation batch size changed reported loss")
-            report[name] = result
+            report[name] = result | {
+                "reset_bpb": score(model, data, 64, carry=False)["bpb"]
+            }
             print(name, result, flush=True)
     (args.out / f"{args.phase}.json").write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8"
