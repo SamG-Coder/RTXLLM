@@ -30,3 +30,9 @@ Windows, AMD Ryzen 7 9800X3D. Parameter bytes measure float32 weights and biases
 | Pride | 8 | 105,750 | 11,812 | 47,248 | 12 | 2.6100 | 6.105 | 12.08 |
 
 At matched context on *Alice*, the eight-bank RTX model scored 4.6280–4.9632 and the exact bigram scored 3.3253. On *Pride*, the two-reflection RTX model scored 2.8655 and the exact trigram scored 2.7414. The 0.0036 bits/byte difference between the two-byte neural comparator and the optical model on *Pride* is small for a single corpus and one neural seed. Both eight-byte neural models achieved lower test loss. Every neural run selected the last available epoch. These results characterize the fixed training budget; longer training and hyperparameter tuning were outside the protocol.
+
+## Targets for geometric models
+
+At matched context length, the exact count models set the stronger observed targets: 3.3253 bits/byte for the Alice bigram and 2.7414 for the Pride trigram. The small neural comparator scored worse than those counts on both corpora, and its validation loss was still falling at epoch 12. The close two-byte Pride scores describe this particular fixed-budget comparison.
+
+In an independent validation-only extension, Claude measured Pride width-2 loss of 2.8875 at epoch 12, 2.8725 at epoch 24 and 2.8612 at epoch 36. The eight-byte runs give longer-context targets of 2.6731 on Alice and 2.6100 on Pride. Their results bound from below the quality already demonstrated by a conventional model under this training budget; a larger or better-trained model could achieve lower loss.
