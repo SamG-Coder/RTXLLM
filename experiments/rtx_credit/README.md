@@ -36,3 +36,15 @@ Each saved scene occupied 46,324 bytes. On RTX 5080 / 616.64 with validation ena
 ## Post-hoc capacity checks
 
 On the same held-out targets, the exact unigram achieved 4.7637 bits/byte. One of the three trained scenes scored worse than that context-free predictor. Holding the learned routes fixed and replacing the 32 output votes with the full empirical distribution of each bank yielded 4.0281, 3.9527 and 3.9682 bits/byte. Giving each byte its own 32-vote distribution yielded 3.9985. Both bank sharing and vote quantization cost quality. These diagnostics used the frozen models after test scoring and did not select training settings.
+
+## Autoregressive generation timing
+
+The generator traces 32 two-reflection votes for every output byte. One Vulkan workgroup processes up to 256 consecutive bytes per dispatch, updating the next input byte from the receiver histogram in GPU shared memory. The host supplies seed-dependent uniform draws. Integer sampling weights implement the same 1% uniform escape as the training model.
+
+On the RTX 5080 with driver 616.64 and the validation layer enabled, the median wall time for 512 bytes from a loaded seed-0 E4 checkpoint fell from 1,156 ms (per-byte host sampling) to 5.40 ms (chunked dispatch). Five trials alternated implementation order. Both paths produced identical output in all five and across 255/256/257-byte boundaries. This 214-fold ratio includes the original runner's per-byte allocation, timing-query, synchronization and readback overhead. It measures warm latency for this eight-bank model. Device setup, shader load, scene construction and the first new-path byte took a separate 466 ms in a fresh process with driver caches available.
+
+Reproduce after running the E4 training command:
+
+```powershell
+& $python -B tools/check_generation.py "$results/feedback-0.npz"
+```
