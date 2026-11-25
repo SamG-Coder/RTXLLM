@@ -1,0 +1,27 @@
+{
+  "targets": 23125,
+  "unseen_targets": 4745,
+  "dish_triangles": 10110,
+  "emission_triangles": 80606,
+  "dish_as_bytes": 617728,
+  "emission_as_bytes": 4870144,
+  "archive_bytes": 988351,
+  "prior": {
+    "ppl": 82.26318132226794,
+    "unseen_ppl": 2430.9469485864192,
+    "seen_ppl": 34.32113317347251
+  },
+  "beam": {
+    "ppl": 80.30785329984826,
+    "unseen_ppl": 2074.7230548802263,
+    "seen_ppl": 34.688254233311355
+  },
+  "shuffled": {
+    "ppl": 85.50194241672058,
+    "unseen_ppl": 2420.590607522008,
+    "seen_ppl": 36.06951057931896
+  },
+  "max_abs_prior_error": 5.8482143683313836e-08,
+  "max_abs_beam_error": 7.756321240837138e-08,
+  "target_readout_s": 0.011721599992597476
+}
