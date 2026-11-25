@@ -38,7 +38,8 @@ def main():
     args = parser.parse_args()
     predictor = Predictor(args.model)
     docs = [np.frombuffer(book(args.books, n), np.uint8) for n in list(BOOKS)[:4]]
-    kn = KneserNey(5).fit(docs)
+    order = predictor.layered.k + 1
+    kn = KneserNey(order).fit(docs)
     raw = book(args.books, "war-36", WAR_SHA)
     data = np.frombuffer(raw, np.uint8)
     matches = reference(raw)
@@ -55,7 +56,10 @@ def main():
     actual = predictor.score(raw)
     np.testing.assert_allclose(actual, expected, rtol=8e-7, atol=1e-10)
     np.testing.assert_allclose(
-        -np.log2(actual).mean(), 2.2010866081353164, atol=1e-5, rtol=0
+        -np.log2(actual).mean(),
+        {5: 2.2010866081353164, 6: 2.1140945536391924}[order],
+        atol=1e-5,
+        rtol=0,
     )
     ring = EpisodicRing(predictor.device, empty_ring(), 0, 0)
     fixture = bytes(range(256)) + b" language is language " * 7
@@ -65,7 +69,7 @@ def main():
         if t not in (1, 2, 3, 4, 8, 255, 256, 257, 258, len(fixture)):
             continue
         p = predictor.distribution(ring)
-        history = fixture[max(0, t - 4) : t]
+        history = fixture[max(0, t - order + 1) : t]
         base = np.array(
             [
                 kn.prob(

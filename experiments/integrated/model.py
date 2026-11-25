@@ -28,7 +28,7 @@ def publish(path, **arrays):
         os.link(stage, path)
 
 
-def build(output, documents, gate_path):
+def build(output, documents, gate_path, order=5):
     with np.load(gate_path, allow_pickle=False) as gate:
         vertices = gate["tri_vertices"]
     if vertices.shape != (9, 3, 3):
@@ -37,7 +37,7 @@ def build(output, documents, gate_path):
     longest = max(map(len, arrays), default=0)
     if longest == 0:
         raise ValueError("Training requires at least one byte")
-    kn = KneserNey(min(5, longest)).fit(arrays)
+    kn = KneserNey(min(order, longest)).fit(arrays)
     publish(output, gate_vertices=vertices, version=1, **write_scene(kn))
 
 
@@ -142,6 +142,13 @@ def main():
     writer = cmds.add_parser("build")
     writer.add_argument("gate", type=Path)
     writer.add_argument("model", type=Path)
+    writer.add_argument(
+        "--order",
+        type=int,
+        choices=range(1, 7),
+        default=5,
+        help="Maximum long-term n-gram order",
+    )
     sources = writer.add_mutually_exclusive_group(required=True)
     sources.add_argument(
         "--documents", type=Path, nargs="+", help="Independent raw training files"
@@ -167,7 +174,7 @@ def main():
             if args.documents
             else (book(args.e9_books, n) for n in list(BOOKS)[:4])
         )
-        build(args.model, docs, args.gate)
+        build(args.model, docs, args.gate, args.order)
         return
     model = Predictor(args.model)
     if args.action == "score":
