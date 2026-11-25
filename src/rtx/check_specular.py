@@ -1,7 +1,7 @@
 """Exercise two physical reflections, padding, misses and workgroup boundaries."""
 
 import numpy as np
-from run_specular import open_kernel, trace
+from run_specular import SpecularScene, open_kernel
 
 
 def main():
@@ -31,10 +31,30 @@ def main():
         ),
     }
     device, kernel = open_kernel()
-    receivers, metrics = trace(device, kernel, scene, queries)
+    gpu_scene = SpecularScene(device, scene)
+    receivers, metrics = gpu_scene.trace(kernel, queries)
     expected = np.tile([[1, 2], [-1, -1], [2, -1], [1, -1]], (33, 1))
     np.testing.assert_array_equal(receivers, expected)
     print(f"Matched all {len(expected)} fixture rows", metrics)
+
+    # Move the second mirror out of the ray, invalidating its old bounds.
+    moved = scene["tri_vertices"].copy()
+    moved[2, :, 0] += 8
+    refit_ms = gpu_scene.refit_vertices(moved)
+    updated, _ = gpu_scene.trace(kernel, queries)
+    rebuilt, _ = SpecularScene(device, dict(scene, tri_vertices=moved)).trace(
+        kernel, queries
+    )
+    np.testing.assert_array_equal(updated, rebuilt)
+    np.testing.assert_array_equal(
+        updated, np.tile([[1, -1], [-1, -1], [-1, -1], [1, -1]], (33, 1))
+    )
+    gpu_scene.refit_vertices(scene["tri_vertices"])
+    restored, _ = gpu_scene.trace(kernel, queries)
+    np.testing.assert_array_equal(restored, receivers)
+    print(
+        f"Refit matched rebuilt paths and restored original paths; refit wall ms {refit_ms:.4f}"
+    )
 
 
 if __name__ == "__main__":
