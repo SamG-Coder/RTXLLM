@@ -52,16 +52,16 @@ class TraceResult:
         return np.where(tot >= threshold, pred, -1)
 
 
-def intersect(scene: Scene, o, d, tmax, facts_visible, t_min, chunk=96):
-    """Closest-hit brute force. Returns (t, tri) with tri = -1 for misses."""
-    V = scene.tri_vertices
-    v0 = V[:, 0]
-    e1 = V[:, 1] - v0
-    e2 = V[:, 2] - v0
-    is_fact = scene.tri_kind == KIND_FACT
+def mt_closest(v0, e1, e2, o, d, tmax, t_min, visible=None, chunk=96):
+    """Closest-hit two-sided Moller-Trumbore over the given triangles (float32).
+
+    ``visible`` optional bool [T] or callable(a, b) -> bool [b-a, T].
+    Returns (t, local tri index or -1)."""
     N = len(o)
     out_t = np.full(N, np.inf, np.float32)
     out_i = np.full(N, -1, np.int64)
+    if len(v0) == 0 or N == 0:
+        return out_t, out_i
     eps = np.float32(1e-12)
     for a in range(0, N, chunk):
         b = min(N, a + chunk)
@@ -77,13 +77,54 @@ def intersect(scene: Scene, o, d, tmax, facts_visible, t_min, chunk=96):
         v = np.einsum("btk,btk->bt", D, q) * inv
         t = np.einsum("btk,tk->bt", q, e2) * inv
         hit = ok & (u >= 0) & (v >= 0) & (u + v <= 1) & (t > t_min) & (t < tmax[a:b, None])
-        hit &= facts_visible[a:b, None] | ~is_fact[None]
+        if visible is not None:
+            hit &= visible(a, b) if callable(visible) else visible[None]
         t = np.where(hit, t, np.inf)
         i = np.argmin(t, axis=1)
         tb = t[np.arange(b - a), i]
         out_t[a:b] = tb
         out_i[a:b] = np.where(np.isfinite(tb), i, -1)
     return out_t, out_i
+
+
+def mt_pairs(v0, e1, e2, o, d, ri, ti, tmax, t_min):
+    """Moller-Trumbore on explicit (ray, triangle) candidate pairs; returns t (inf = no hit)."""
+    D, O = d[ri], o[ri]
+    p = np.cross(D, e2[ti])
+    det = (p * e1[ti]).sum(1)
+    ok = np.abs(det) > np.float32(1e-12)
+    inv = np.where(ok, 1.0 / np.where(ok, det, 1), 0).astype(np.float32)
+    s = O - v0[ti]
+    u = (s * p).sum(1) * inv
+    q = np.cross(s, e1[ti])
+    v = (D * q).sum(1) * inv
+    t = (q * e2[ti]).sum(1) * inv
+    hit = ok & (u >= 0) & (v >= 0) & (u + v <= 1) & (t > t_min) & (t < tmax[ri])
+    return np.where(hit, t, np.inf).astype(np.float32)
+
+
+def closest_of_pairs(N, ri, ti, t):
+    """Reduce pair hits to the closest per ray; ties -> lowest triangle index."""
+    out_t = np.full(N, np.inf, np.float32)
+    out_i = np.full(N, -1, np.int64)
+    if len(ri) == 0:
+        return out_t, out_i
+    np.minimum.at(out_t, ri, t)
+    best = np.isfinite(t) & (t == out_t[ri])
+    big = np.iinfo(np.int64).max
+    tmp = np.full(N, big, np.int64)
+    np.minimum.at(tmp, ri[best], ti[best])
+    out_i = np.where(tmp == big, -1, tmp)
+    return out_t, out_i
+
+
+def intersect(scene: Scene, o, d, tmax, facts_visible, t_min, chunk=96):
+    """Closest-hit brute force over the whole scene. Returns (t, tri) with tri = -1 for misses."""
+    V = scene.tri_vertices
+    v0 = V[:, 0]
+    is_fact = scene.tri_kind == KIND_FACT
+    vis = lambda a, b: facts_visible[a:b, None] | ~is_fact[None]  # noqa: E731
+    return mt_closest(v0, V[:, 1] - v0, V[:, 2] - v0, o, d, tmax, t_min, vis, chunk)
 
 
 def trace(scene: Scene, starts, programs, record_events=True) -> TraceResult:
