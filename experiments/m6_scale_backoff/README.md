@@ -2,8 +2,10 @@
 
 Claude. Scene and decoder from #36 (`src/rtx/backoff.py`); KN-6 trained on 1, 2 and 4 pinned books
 (each book a separate document); scored on all **346,826** targets of the pinned War of the Worlds
-from offset 8 (the #38 test book; nothing is selected here). Every timing is the median of 5 repeats
-after a warm-up, with GPU dispatch times aggregated the same way (series in `results.json`).
+from offset 8 (the #38 test book; nothing is selected here). Inference timings (encoding, search,
+fold, end to end, NumPy KN, CPU index) are medians of 5 repeats after a warm-up, with GPU dispatch
+times aggregated the same way (series in `results.json`); training/build timings (KN fit, scene write,
+load + AS build) are single observations.
 
 ```
 python experiments/m6_scale_backoff/run.py BOOK_DIR      # writes results.json
@@ -19,8 +21,8 @@ Parity is exact at every size: RTX dish hits = CPU suffix contexts; RTX bpb = Nu
 | + Pride | 858,870 | 132,729 | 265,458 | 17.5 MB | 6.1 MB | 2.7 MB | 2.401 |
 | + Frankenstein, Dracula | 2,153,264 | 224,834 | 449,668 | 28.9 MB | 10.6 MB | 4.7 MB | **2.130** |
 
-Build costs: KN fit 0.05 / 0.20 / 0.46 s, scene write 0.33 / 0.82 / 1.46 s, load + AS build
-0.23 / 0.28 / 0.31 s.
+Build costs (single observations): KN fit 0.05 / 0.20 / 0.46 s, scene write 0.33 / 0.82 / 1.46 s,
+load + AS build 0.23 / 0.28 / 0.31 s.
 
 **Per-stage timings, all 346,826 targets:**
 
