@@ -1,0 +1,5 @@
+NVIDIA GeForce RTX 5080
+feedback round 5: {"ppl": 86.205, "ppl_unseen": 2157.76, "ppl_seen": 37.481, "unseen_frac": 0.206}
+feedback round 10: {"ppl": 85.95, "ppl_unseen": 2153.083, "ppl_seen": 37.363, "unseen_frac": 0.206}
+feedback round 20: {"ppl": 85.505, "ppl_unseen": 2138.943, "ppl_seen": 37.183, "unseen_frac": 0.206}
+feedback round 30: {"ppl": 85.147, "ppl_unseen": 2121.978, "ppl_seen": 37.063, "unseen_frac": 0.206}

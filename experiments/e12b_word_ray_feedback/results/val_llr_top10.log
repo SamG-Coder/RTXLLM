@@ -1,0 +1,18 @@
+NVIDIA GeForce RTX 5080
+feedback round 5: {"ppl": 85.98, "ppl_unseen": 2155.444, "ppl_seen": 37.368, "unseen_frac": 0.206}
+feedback round 10: {"ppl": 85.979, "ppl_unseen": 2169.1, "ppl_seen": 37.307, "unseen_frac": 0.206}
+feedback round 20: {"ppl": 85.18, "ppl_unseen": 2141.899, "ppl_seen": 36.992, "unseen_frac": 0.206}
+feedback round 30: {"ppl": 85.091, "ppl_unseen": 2140.935, "ppl_seen": 36.947, "unseen_frac": 0.206}
+feedback round 40: {"ppl": 85.005, "ppl_unseen": 2140.036, "ppl_seen": 36.904, "unseen_frac": 0.206}
+feedback round 60: {"ppl": 84.948, "ppl_unseen": 2139.683, "ppl_seen": 36.874, "unseen_frac": 0.206}
+feedback round 80: {"ppl": 84.918, "ppl_unseen": 2132.813, "ppl_seen": 36.889, "unseen_frac": 0.206}
+feedback round 120: {"ppl": 84.572, "ppl_unseen": 2113.384, "ppl_seen": 36.787, "unseen_frac": 0.206}
+shuffled round 5: {"ppl": 86.7, "ppl_unseen": 2199.184, "ppl_seen": 37.567, "unseen_frac": 0.206}
+shuffled round 10: {"ppl": 86.841, "ppl_unseen": 2199.313, "ppl_seen": 37.643, "unseen_frac": 0.206}
+shuffled round 20: {"ppl": 86.817, "ppl_unseen": 2196.217, "ppl_seen": 37.644, "unseen_frac": 0.206}
+shuffled round 30: {"ppl": 86.779, "ppl_unseen": 2198.688, "ppl_seen": 37.612, "unseen_frac": 0.206}
+shuffled round 40: {"ppl": 86.648, "ppl_unseen": 2188.953, "ppl_seen": 37.584, "unseen_frac": 0.206}
+shuffled round 60: {"ppl": 86.722, "ppl_unseen": 2193.419, "ppl_seen": 37.605, "unseen_frac": 0.206}
+shuffled round 80: {"ppl": 86.717, "ppl_unseen": 2194.877, "ppl_seen": 37.595, "unseen_frac": 0.206}
+shuffled round 120: {"ppl": 86.727, "ppl_unseen": 2198.279, "ppl_seen": 37.585, "unseen_frac": 0.206}
+KN: {'ppl': 83.68904850332159, 'ppl_unseen': 2319.0892769218754, 'ppl_seen': 35.442231149766805, 'unseen_frac': 0.20550077841203945}
