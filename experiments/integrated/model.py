@@ -33,7 +33,11 @@ def build(output, documents, gate_path):
         vertices = gate["tri_vertices"]
     if vertices.shape != (9, 3, 3):
         raise ValueError("Expected nine gate triangles")
-    kn = KneserNey(5).fit([np.frombuffer(raw, np.uint8) for raw in documents])
+    arrays = [np.frombuffer(raw, np.uint8) for raw in documents]
+    longest = max(map(len, arrays), default=0)
+    if longest == 0:
+        raise ValueError("Training requires at least one byte")
+    kn = KneserNey(min(5, longest)).fit(arrays)
     publish(output, gate_vertices=vertices, version=1, **write_scene(kn))
 
 
@@ -110,19 +114,20 @@ class Predictor:
         episode = ring.query()[None, :]
         k = self.layered.k
         n = min(ring.count, k)
-        recent = dispatch(
-            self.device,
-            self.recent,
-            ring.scene,
-            np.empty(n, np.int32),
-            "suffix",
-            targets=n,
-            ringCursor=ring.cursor,
-        )
-        if np.any((recent < 0) | (recent > 255)):
-            raise RuntimeError("Missing recent byte")
         history = np.zeros(k, np.uint8)
-        history[-n:] = recent
+        if n:
+            recent = dispatch(
+                self.device,
+                self.recent,
+                ring.scene,
+                np.empty(n, np.int32),
+                "suffix",
+                targets=n,
+                ringCursor=ring.cursor,
+            )
+            if np.any((recent < 0) | (recent > 255)):
+                raise RuntimeError("Missing recent byte")
+            history[-n:] = recent
         point = self.layered.points(history, np.array([k]))
         dishes, _ = self.layered.trace(self.suffix_kernel, point, budget=n + 1)
         p = self.decode(dishes, episode, np.arange(256), full=True)
