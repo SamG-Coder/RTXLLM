@@ -25,9 +25,9 @@ BOOKS = {
 }
 
 
-def book(folder, name):
+def book(folder, name, digest=None):
     raw = (folder / f"rtxllm-{name}.txt").read_bytes()
-    if hashlib.sha256(raw).hexdigest() != BOOKS[name]:
+    if hashlib.sha256(raw).hexdigest() != (digest or BOOKS[name]):
         raise ValueError(f"Digest mismatch for {name}")
     body = re.search(
         rb"(?ms)^\*\*\* START OF.*?\*\*\*[^\S\n]*\n(.*?)^\*\*\* END OF", raw
@@ -50,13 +50,15 @@ def dispatch(device, kernel, scene, output, field, **params):
     return buf.to_numpy().view(output.dtype).reshape(output.shape).copy()
 
 
-def prior(device, folder):
+def fit_prior(documents):
     counts = np.zeros((256, 256), np.int64)
     uni = np.zeros(256, np.int64)
-    for name in list(BOOKS)[:4]:
-        x = np.frombuffer(book(folder, name), np.uint8).astype(np.int32)
+    for raw in documents:
+        x = np.frombuffer(raw, np.uint8).astype(np.int32)
         counts += np.bincount(256 * x[:-1] + x[1:], minlength=65536).reshape(256, 256)
         uni += np.bincount(x, minlength=256)
+    if not uni.sum():
+        raise ValueError("Prior training requires at least one observed byte")
     unigram = uni / uni.sum()
     base = np.divide(
         counts,
@@ -67,17 +69,26 @@ def prior(device, folder):
     probs = 0.99 * base + 0.01 / 256
     idx = np.arange(65536)
     centers = np.column_stack((idx % 256, idx // 256, probs.ravel()))
-    scene = TriangleScene(
-        device, geometry(centers, [(-0.4, -0.4, 0), (0.4, -0.4, 0), (0, 0.4, 0)])
-    )
+    data = geometry(centers, [(-0.4, -0.4, 0), (0.4, -0.4, 0), (0, 0.4, 0)])
+    return data, probs, 0.99 * unigram + 0.01 / 256
+
+
+def read_prior(device, data):
+    scene = TriangleScene(device, data)
     kernel = device.create_compute_kernel(
         device.load_program("episodic.slang", ["readMass"])
     )
     values = dispatch(
         device, kernel, scene, np.empty(65536, np.float32), "masses"
     ).reshape(256, 256)
+    return values.astype(np.float64)
+
+
+def prior(device, folder):
+    data, probs, uni = fit_prior(book(folder, name) for name in list(BOOKS)[:4])
+    values = read_prior(device, data)
     np.testing.assert_allclose(values, probs, rtol=2e-6, atol=1e-10)
-    return values.astype(np.float64), 0.99 * unigram + 0.01 / 256
+    return values, uni
 
 
 def trace(device, kernel, raw):

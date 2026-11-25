@@ -22,15 +22,11 @@ int readByte(int row)
     return hit < 0 ? -1 : int(round(hit)) - 1;
 }
 
-[shader("compute")]
-[numthreads(64, 1, 1)]
-void trace(uint3 tid : SV_DispatchThreadID)
+int4 search(int t, int lower, out int lastByte)
 {
-    if (tid.x >= targets) return;
-    int t = int(tid.x) + 8;
-    int lower = max(0, t - 256);
     int history[8];
     for (int k = 0; k < 8; ++k) history[k] = readByte(t - 1 - k);
+    lastByte = history[0];
     int calls = 8;
     int cursor = t - 1;
     int best = 0, prediction = -1, recent = -1;
@@ -59,7 +55,35 @@ void trace(uint3 tid : SV_DispatchThreadID)
         if (best == 8) break;
         cursor = row;
     }
-    outcomes[tid.x] = int4(recent, prediction, best, calls);
+    return int4(recent, prediction, best, calls);
+}
+
+[shader("compute")]
+[numthreads(64, 1, 1)]
+void trace(uint3 tid : SV_DispatchThreadID)
+{
+    if (tid.x >= targets) return;
+    int t = int(tid.x) + 8;
+    int lastByte;
+    outcomes[tid.x] = search(t, max(0, t - 256), lastByte);
+}
+
+uint ringCursor;
+uint ringCount;
+
+[shader("compute")]
+[numthreads(1, 1, 1)]
+void live()
+{
+    int t = 256 + int(ringCursor);
+    if (ringCount < 8)
+    {
+        outcomes[0] = int4(-1, -1, 0, readByte(t - 1));
+        return;
+    }
+    int lastByte;
+    int4 hit = search(t, t - int(ringCount), lastByte);
+    outcomes[0] = int4(hit.xyz, lastByte);
 }
 
 [shader("compute")]
