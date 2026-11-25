@@ -112,10 +112,13 @@ def mixture_grid(model, ids, q, has, prev, nxt):
     }
 
 
-def evaluate(model, ids, paths, radial, prev, nxt):
+def evaluate(model, ids, paths, radial, prev, nxt, settings=None):
     rows = np.broadcast_to(np.arange(len(ids))[:, None], radial.shape)
     scores = []
     for depth in range(1, 4):
+        if settings is not None and depth not in settings:
+            scores.append({})
+            continue
         observed = paths[:, :, :depth]
         energy = radial / np.maximum(1, (observed >= 0).sum(2))
         weight = np.zeros((len(ids), len(ids)))
@@ -125,7 +128,11 @@ def evaluate(model, ids, paths, radial, prev, nxt):
         total = weight.sum(1)
         weight /= np.where(total > 0, total, 1)[:, None]
         q = weight @ model.Pml[ids]
-        scores.append(mixture_grid(model, ids, q, total > 0, prev, nxt))
+        if settings is None:
+            scores.append(mixture_grid(model, ids, q, total > 0, prev, nxt))
+        else:
+            lam = settings[depth]
+            scores.append({str(lam): score(model, ids, q, total > 0, lam, prev, nxt)})
     return scores
 
 
