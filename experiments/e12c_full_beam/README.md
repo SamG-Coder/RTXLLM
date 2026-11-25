@@ -48,8 +48,7 @@ bigrams and kNN (within 0.2%).
   is close to the high-D one (79.45).
 - Traversal does **causal** work (ADR 0003 b): scrambling the layout or the hit-to-payload routing
   hurts badly. But on matched comparison (ADR 0003 c) it is a class-based smoother that a dense
-  Gaussian kernel over the same coordinates slightly beats. Occlusion and finite ray sampling
-  appear to cost a little rather than help.
+  Gaussian kernel over the same coordinates slightly beats.
 - **Post-hoc, validation only** (`posthoc_occlusion.py REPO_ROOT BOOK_DIR`, run after the sealed test;
   no test numbers): nearest-hit occlusion *costs* accuracy. With transmission γ per dish crossed
   (exact CPU all-hit lists; γ = 0 reproduces the RTX closest-hit numbers exactly), validation
