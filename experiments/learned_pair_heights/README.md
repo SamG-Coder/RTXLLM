@@ -29,3 +29,23 @@ python experiments/learned_pair_heights/learn_heights.py generate words.npz OUT 
 ~~~
 
 Generation needs only words.npz and OUT/learned.npz. It reads the probabilities for the whole vocabulary, checks their sum and samples on the host. E16 uses the exact pair output of the shared E15 tracer; the auxiliary donor result is discarded. Each test report records group support in the order unseen, three known-word groups, three unknown-word groups. The heights array begins with the global control.
+
+## Transfer to three other authors
+
+The frozen E14, E15 and E16 archives were replayed on every next-token target after the first two tokens of each book. No calibration or fitting used the test texts. SHA-256 checks pin the four archives and three books. All grouped, global, fixed and shuffled pair weights and probabilities matched the CPU count mixtures within 2e-6. These books had been used in separate byte-model experiments; this was their first use as E16 word transfer tests.
+
+| Book | Targets | One-word perplexity | Single fitted height | Grouped heights | Relative gain vs one word (95% block interval) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| The Adventures of Sherlock Holmes | 128,960 | 126.60 | 123.92 | 123.65 | 2.33% (2.16–2.51%) |
+| The War of the Worlds | 73,963 | 117.03 | 115.60 | 115.29 | 1.49% (1.33–1.66%) |
+| Moby Dick | 281,049 | 120.32 | 119.50 | 119.07 | 1.03% (0.94–1.12%) |
+
+All three point estimates passed the registered 1% threshold. The Moby Dick interval includes smaller gains. Across 483,972 targets, token-weighted log loss gave a 1.45% reduction in perplexity. Shuffling the earlier word produced worse perplexity than the one-word predictor on every book. Most of the improvement was available from the global height.
+
+Unknown targets accounted for 16.1%, 19.2% and 22.3% respectively. Restricted to known targets, the relative gains were 2.76%, 1.24% and 0.85%. The model assigns a single token to all unknown words. Predicting that token does not identify the original word. Intervals resample 256-target contiguous blocks within each book, retaining the length of the final block. They describe variation within these texts and do not estimate uncertainty over new authors.
+
+Run the following command with the original frozen archives and the same pinned editions used in the E11 (Holmes), E9 (War) and E13 (Moby Dick) experiments. Exact SHA-256 digests are in the runner. The [full report](transfer.json) gives all controls, group support, and known/unknown results.
+
+~~~sh
+python experiments/learned_pair_heights/transfer.py words.npz E15/pairs.npz E16 BOOK_DIRECTORY transfer.json
+~~~
