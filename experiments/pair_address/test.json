@@ -1,0 +1,45 @@
+{
+  "book": "treasure-120",
+  "targets": 376884,
+  "model_sha256": "1767597d9146df288cca354c4ac97a10a908c5305da7ec6777d098621cc5d914",
+  "no_copy_bpb": 2.174104123268516,
+  "conditions": {
+    "one_256": {
+      "bpb": 2.1499436928803775,
+      "rays": 12725915,
+      "coverage": 0.6153299158361724,
+      "copy_accuracy": 0.328811425220346,
+      "triangles": 376892,
+      "as_bytes": 22758528,
+      "search_wall_s": 0.1604427999991458
+    },
+    "one_2048": {
+      "bpb": 2.137617607903863,
+      "rays": 16736900,
+      "coverage": 0.7299142441706201,
+      "copy_accuracy": 0.36901702333392705,
+      "triangles": 376892,
+      "as_bytes": 22758528,
+      "search_wall_s": 0.024831999995512888
+    },
+    "pair_256": {
+      "bpb": 2.1492859070069854,
+      "rays": 5613058,
+      "coverage": 0.6607470733700556,
+      "copy_accuracy": 0.3192530870394539,
+      "triangles": 376892,
+      "as_bytes": 22758528,
+      "search_wall_s": 0.026859500008868054
+    },
+    "pair_2048": {
+      "bpb": 2.113709757601711,
+      "rays": 12362509,
+      "coverage": 0.9325070844079345,
+      "copy_accuracy": 0.39710112762379535,
+      "triangles": 376892,
+      "as_bytes": 22758528,
+      "search_wall_s": 0.025941800005966797
+    }
+  },
+  "passes": true
+}
