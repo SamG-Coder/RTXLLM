@@ -16,38 +16,40 @@ float intersect(float3 origin, float3 direction, float reach)
     return q.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? q.CommittedRayT() : -1;
 }
 
-int readByte(int row)
+int readByte(int row, bool paired = false)
 {
-    float hit = intersect(float3(-1, row, 0), float3(1, 0, 0), 257);
-    return hit < 0 ? -1 : int(round(hit)) - 1;
+    float hit = intersect(float3(-1, row, 0), float3(1, 0, 0), paired ? 65537 : 257);
+    return hit < 0 ? -1 : (int(round(hit)) - 1) & 255;
 }
 
-int4 search(int t, int lower, out int lastByte)
+int4 search(int t, int lower, out int lastByte, bool paired = false)
 {
     int history[8];
-    for (int k = 0; k < 8; ++k) history[k] = readByte(t - 1 - k);
+    for (int k = 0; k < 8; ++k) history[k] = readByte(t - 1 - k, paired);
     lastByte = history[0];
+    int column = paired ? 256 * history[1] + history[0] : history[0];
+    int firstEnd = paired ? lower + 1 : lower;
     int calls = 8;
     int cursor = t - 1;
     int best = 0, prediction = -1, recent = -1;
-    for (int i = 0; i < 16 && cursor > lower; ++i)
+    for (int i = 0; i < 16 && cursor > firstEnd; ++i)
     {
-        float distance = intersect(float3(history[0], cursor - 0.5, 0),
-                                   float3(0, -1, 0), cursor - lower - 0.25);
+        float distance = intersect(float3(column, cursor - 0.5, 0),
+                                   float3(0, -1, 0), cursor - firstEnd - 0.25);
         calls++;
         if (distance < 0) break;
         int row = int(round(cursor - 0.5 - distance));
-        int length = 1;
+        int length = paired ? 2 : 1;
         while (length < 8 && row - length >= lower)
         {
-            int older = readByte(row - length);
+            int older = readByte(row - length, paired);
             calls++;
             if (older != history[length]) break;
             length++;
         }
         if (length > best)
         {
-            prediction = readByte(row + 1);
+            prediction = readByte(row + 1, paired);
             calls++;
             best = length;
             if (i == 0) recent = prediction;
@@ -102,4 +104,16 @@ void recentBytes(uint3 tid : SV_DispatchThreadID)
 {
     if (tid.x < targets)
         suffix[tid.x] = readByte(int(256 + ringCursor - targets + tid.x));
+}
+
+uint windowSize, pairAddress;
+
+[shader("compute")]
+[numthreads(64, 1, 1)]
+void indexedTrace(uint3 tid : SV_DispatchThreadID)
+{
+    if (tid.x >= targets) return;
+    int t = int(tid.x) + 8;
+    int lastByte;
+    outcomes[tid.x] = search(t, max(0, t - int(windowSize)), lastByte, pairAddress != 0);
 }

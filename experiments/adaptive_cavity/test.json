@@ -1,0 +1,42 @@
+{
+  "train_targets": 2153232,
+  "book": "time-35",
+  "scored_bytes": 184725,
+  "counts": {
+    "order_2": 3.555876904638224,
+    "order_3": 2.9356409463130304,
+    "order_4": 2.456055751948806,
+    "order_5": 2.2238273306118495,
+    "order_6": 2.2181505356724958,
+    "order_7": 2.3524994441783886,
+    "order_8": 2.556315649639398
+  },
+  "adaptive_1": {
+    "bpb": 3.081523629709731,
+    "cavity_and_region_completion": 1.0,
+    "nonempty_row": 0.9999566923805657
+  },
+  "fixed_1": {
+    "bpb": 2.94856307356205,
+    "valid": 1.0,
+    "coverage": 0.9096061713357694,
+    "backoff_bpb": 3.5006351873926
+  },
+  "adaptive_7": {
+    "bpb": 3.0885824338267063,
+    "cavity_and_region_completion": 1.0,
+    "nonempty_row": 0.9999566923805657
+  },
+  "fixed_7": {
+    "bpb": 3.1072602041312445,
+    "valid": 1.0,
+    "coverage": 0.4316470429016105,
+    "backoff_bpb": 3.5006351873926
+  },
+  "shuffled": {
+    "bpb": 3.3121917663597964,
+    "cavity_and_region_completion": 1.0,
+    "nonempty_row": 0.9999566923805657
+  },
+  "passes": false
+}
