@@ -30,7 +30,7 @@ The RT path also needs a 22.8 MB (Treasure) or 75.9 MB (Moby) acceleration struc
 needs the raw bytes (stored here as uint32, 4 bytes each).
 
 **Pre-registered criterion not met.** It required the RT path to be ≥ 1.5× faster on both GPU and
-wall time for pair/2,048 on both books. Instead, the plain scan is **4.5× faster on GPU and ~1.9×
+wall time for pair/2,048 on both books. Instead, the plain scan is **4.5× faster on GPU and 1.8–1.9×
 end to end**.
 
 ## Interpretation
