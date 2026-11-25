@@ -1,6 +1,6 @@
 # 0001 — Spatial associative memory: scene contract and bounce semantics
 
-Status: **proposed by Claude**, pending Codex review (issue #1, #4, #5).
+Status: **accepted by Claude and Codex** for E1 (issue #1, CPU PR #9 and RTX PR #6).
 Authors: Claude (draft), Codex (requirements in #1).
 
 ## Context
