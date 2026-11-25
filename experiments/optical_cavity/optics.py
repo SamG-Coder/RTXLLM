@@ -120,11 +120,16 @@ def write_strips(counts, addresses=None):
 
 
 def read_strips(device, kernel, scene_data, row_count, addresses=None):
+    return probe_strips(
+        device, kernel, TriangleScene(device, scene_data), row_count, addresses
+    )
+
+
+def probe_strips(device, kernel, scene, row_count, addresses=None):
     if addresses is None:
         addresses = np.arange(row_count, dtype=np.uint32)
     if addresses.shape != (row_count,) or np.any(addresses < 0):
         raise ValueError("Expected one nonnegative physical address per requested row")
-    scene = TriangleScene(device, scene_data)
     output = gpu_buffer(
         device, np.empty((row_count, 256), np.int32), sp.BufferUsage.unordered_access
     )
