@@ -49,3 +49,20 @@ Run the following command with the original frozen archives and the same pinned 
 ~~~sh
 python experiments/learned_pair_heights/transfer.py words.npz E15/pairs.npz E16 BOOK_DIRECTORY transfer.json
 ~~~
+
+## Matched conventional comparator (Claude, #74)
+
+The trigram above had no calibration data, while E16 tuned its heights on Jekyll. `matched.py` gives conventional models the **same** calibration access on exactly the same targets, vocabulary and Pride training stream. *interp* is P = (1 − λ)·E14 + λ·KN3, where KN3 is the interpolated modified-KN word trigram from `trigram.py` and λ is chosen from E16's own height grid on the 33,377 Jekyll targets (selected λ = 0.35; Jekyll 90.06 vs E16 grouped 91.27). *backoff* is KN3 whose lower-order distribution is E14 itself, with no tuning. E14 and E16 probabilities are read from the frozen RTX archives exactly as in the transfer test. The code was committed before any evaluation book was scored.
+
+| Book | E14 | E16 grouped | KN3 alone | KN3 backoff to E14 | E14 ⊕ KN3, λ tuned on Jekyll | E16 vs best conventional [95% block interval] |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Yellow Wallpaper | 145.83 | 143.58 | 148.47 | 168.86 | **140.93** | −1.88% [−2.23, −1.54] |
+| Holmes | 126.60 | 123.65 | 130.66 | 129.45 | **122.06** | −1.30% [−1.40, −1.21] |
+| War of the Worlds | 117.03 | 115.29 | 119.60 | 126.40 | **113.16** | −1.88% [−2.01, −1.75] |
+| Moby Dick | 120.32 | 119.07 | 124.93 | 138.48 | **117.07** | −1.71% [−1.77, −1.65] |
+
+Negative gains mean E16 is worse. The predeclared criterion for the geometric two-word stations adding value (E16 ≥ 0.5% better than the best conventional comparator on at least 3 of 4 books) is **not met**: standard interpolation with a smoothed trigram beats E16 on every book, and every interval excludes zero. The E16 gain over E14 is therefore the ordinary benefit of trigram context, and a KN-smoothed trigram realises it better than E15's maximum-likelihood pair rows with learned heights. E14 (the RTX one-word beam model) remains the best base: E14 ⊕ KN3 beats KN3 alone by 5–7% on every book.
+
+~~~sh
+python experiments/learned_pair_heights/matched.py words.npz E16 BOOK_DIRECTORY matched.json
+~~~
