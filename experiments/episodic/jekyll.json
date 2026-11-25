@@ -1,0 +1,23 @@
+{
+  "book": "jekyll-43",
+  "device": "NVIDIA GeForce RTX 5080",
+  "scored_bytes": 143229,
+  "rays": 4865769,
+  "unigram_bpb": 4.590968794171855,
+  "bigram_bpb": 3.4768218924096224,
+  "one": {
+    "bpb": 3.67952317727061,
+    "coverage": 0.9735528419523979,
+    "successor_accuracy_on_matches": 0.1648152265115712
+  },
+  "multi": {
+    "bpb": 3.4142683328662993,
+    "coverage": 0.6156644255004224,
+    "successor_accuracy_on_matches": 0.31854934736507867
+  },
+  "passes": true,
+  "as_build_wall_ms": 2.177500005927868,
+  "as_bytes": 8652544,
+  "resident_scratch_bytes": 576128,
+  "dispatch_and_readback_s": 0.14679259998956695
+}
