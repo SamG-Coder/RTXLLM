@@ -34,6 +34,7 @@ $python = "$env:TEMP/rtxllm-vk-env/Scripts/python"
 $env:VK_LOADER_LAYERS_DISABLE = '~implicit~'  # Needed for adapter discovery on the development host
 & $python tools/byte_model.py train README.md model-a --seed 0
 & $python tools/byte_model.py update model-a GOAL.md model-b
+& $python tools/byte_model.py score model-b/scene.npz heldout-a.txt heldout-b.txt
 & $python tools/byte_model.py generate model-b/scene.npz "Geometry" --count 64 --seed 7
 ```
 
@@ -42,3 +43,5 @@ Each training run publishes a new directory after verifying the reloaded geometr
 ## License
 
 MIT.
+
+The score command reports bits per byte over within-file transitions. The first byte of each file supplies context and is excluded from the target count. It reads the transition probabilities from the exported scene with one batched RTX dispatch.

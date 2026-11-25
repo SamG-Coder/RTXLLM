@@ -94,3 +94,12 @@ void readMass(uint3 tid : SV_DispatchThreadID)
     masses[tid.x] = intersect(float3(tid.x % 256, tid.x / 256, 0),
                                float3(0, 0, 1), 2);
 }
+
+RWStructuredBuffer<int> suffix;
+[shader("compute")]
+[numthreads(1, 1, 1)]
+void recentBytes(uint3 tid : SV_DispatchThreadID)
+{
+    if (tid.x < targets)
+        suffix[tid.x] = readByte(int(256 + ringCursor - targets + tid.x));
+}

@@ -5,8 +5,8 @@ similarity, missing pairs) is present for **word bigrams** and absent for bytes 
 
 ## Setup
 Pride and Prejudice (#10 pin), lowercase tokens `[a-z0-9]+|[^\sa-z0-9]`, contiguous 70/15/15
-(107,916 / 23,126 / 23,126 tokens). Vocabulary = training words seen ≥ 2 times plus UNK (3,338).
-Everything is fit on the training split only.
+(107,916 / 23,126 / 23,126 tokens; 23,125 scored transitions per held-out split). Vocabulary =
+training words seen ≥ 2 times plus UNK (3,338). Everything is fit on the training split only.
 
 - **Baseline:** interpolated modified Kneser–Ney word bigram (D1/D2/D3+, continuation base).
 - **Layout:** 1,685 words with ≥ 5 training continuations placed in 3-D by a force layout whose
@@ -18,6 +18,10 @@ Everything is fit on the training split only.
   reads itself) fired on RTX from the previous word's station; each ray's first dish hit contributes
   that neighbour's payload, weighted by a Gaussian profile (σ, width 2.5σ).
   P(v | w) = (1 − λ)·KN(v | w) + λ·q_w(v).
+- **What runs where:** the beam depends only on the previous word, so it is traced **once per
+  dish-owning word** (1,685 beams × 512 rays, a single intersection each) and cached; the host then
+  pools the hit dishes' empirical payloads into q_w and scores all transitions. Dispatch timings below
+  are for that one batch of beams, not per scored token.
 
 ```
 python experiments/e12_word_layout/run.py val  BOOK_DIR
@@ -57,3 +61,25 @@ ms GPU dispatch; acceleration structure 0.6 MB.
 - This is a class-based-LM effect (as in classic word-clustering LMs) realised in RTX geometry. It is
   word-level and bigram-only; byte-level smoothing gives nothing (#23).
 - One book; one seed of the layout; vocabulary and tokeniser are simple.
+
+## Post-hoc controls (added in review, #57; sealed result above unchanged)
+`posthoc_controls.py` → `results/posthoc_controls.json`. Both were added **after** the sealed test
+was opened; their settings were selected on validation only and test was scored once.
+
+| control (test) | perplexity | unseen-bigram perplexity | seen |
+|---|---:|---:|---:|
+| modified-KN word bigram | 82.26 | 2,431 | 34.32 |
+| **discrete class bigram** (k-means on the same train-only next-word features; K = 100, λ = 0.2 selected on val from K ∈ {25…400}, λ ∈ {0.05…0.3}) | **79.45** | **2,009** | 34.51 |
+| beam, learned layout (sealed, λ = 0.1) | 80.31 | 2,075 | 34.69 |
+| **pencil**: one RTX ray per word inside its *own* dish, λ = 0.1 | 82.08 | 2,616 | 33.58 |
+
+- The **class bigram beats the beam** on test (79.45 vs 80.31; unseen 2,009 vs 2,075). The physical
+  beam is a working class-based smoother, but not the best one here; it also used a smaller frozen λ.
+- The **pencil** reads only the word's own stored bigram: it does not generalise (unseen 2,616, worse
+  than KN), so the beam's gain comes from neighbours. 93.6% of pencils hit their own dish first;
+  6.4% are occluded by a neighbour's dish in front (RTX = CPU on all).
+
+**Revised conclusion:** spatial geometry carries the class-based-LM effect for words (beam over a
+learned layout −2.4% overall / −14.7% unseen vs KN, random layout +3.2%), but on this corpus a
+discrete class bigram over the same features is better. No advantage of the ray-traced smoother over
+conventional class/neighbour methods is claimed.

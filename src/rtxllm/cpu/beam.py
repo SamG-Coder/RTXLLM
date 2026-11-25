@@ -34,15 +34,16 @@ class BeamParams:
     width: float = 1.0
     rays: int = 256
     core: float = 0.5
+    inner: float = 0.0             # >0: halo rays on an annulus (inner, width]; core must be 0
     span: float | None = None      # default: width
     fact_distance: float = 1.5     # must match the GeometryConfig used to write facts
     energy_floor: float = 1e-5     # station energies below this are not re-emitted
 
 
-def sunflower(n, radius):
-    """Deterministic, area-uniform points in a disk."""
+def sunflower(n, radius, inner=0.0):
+    """Deterministic, area-uniform points in a disk (or annulus inner < r <= radius)."""
     i = np.arange(n) + 0.5
-    rr = radius * np.sqrt(i / n)
+    rr = np.sqrt(inner ** 2 + (radius ** 2 - inner ** 2) * i / n)
     th = i * np.pi * (3 - 5 ** 0.5)
     return np.stack([rr * np.cos(th), rr * np.sin(th)], 1)
 
@@ -92,7 +93,9 @@ class BeamTracer:
         self.rec_r = float(np.linalg.norm(V[rec] - scene.station_pos[scene.tri_station[rec]][:, None], axis=-1).max()) * 1.001 + 1e-6
         w = beam.width
         self.span = w if beam.span is None else beam.span
-        halo = sunflower(beam.rays, w) if (w > 0 and beam.core < 1) else np.zeros((0, 2))
+        if beam.inner > 0:
+            assert beam.core == 0 and beam.inner < w, "annular beams have no core ray"
+        halo = sunflower(beam.rays, w, beam.inner) if (w > 0 and beam.core < 1) else np.zeros((0, 2))
         self.offsets = np.vstack([[0.0, 0.0], halo]).astype(np.float32)
         hw = (1.0 - beam.core) / max(1, len(halo)) if len(halo) else 0.0
         self.weights = np.concatenate([[beam.core if len(halo) else 1.0], np.full(len(halo), hw)]).astype(np.float32)

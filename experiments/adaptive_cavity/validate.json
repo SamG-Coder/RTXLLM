@@ -1,0 +1,58 @@
+{
+  "train_targets": 2153232,
+  "book": "jekyll-43",
+  "scored_bytes": 143229,
+  "counts": {
+    "order_2": 3.5601770069996403,
+    "order_3": 2.9085541126747225,
+    "order_4": 2.402864030637295,
+    "order_5": 2.1707342897631094,
+    "order_6": 2.1599260182045414,
+    "order_7": 2.287249962231408,
+    "order_8": 2.4897506213866447
+  },
+  "geometry_1": {
+    "leaves": 701,
+    "adaptive_triangles": 22200,
+    "adaptive_bytes": 325183,
+    "fixed_rows": 765,
+    "fixed_triangles": 23320,
+    "fixed_bytes": 336358
+  },
+  "adaptive_1": {
+    "bpb": 3.0803264487934303,
+    "cavity_and_region_completion": 1.0,
+    "nonempty_row": 0.9999581090421632
+  },
+  "fixed_1": {
+    "bpb": 2.945369763530195,
+    "valid": 1.0,
+    "coverage": 0.8961453336963883,
+    "backoff_bpb": 3.519886132777089
+  },
+  "geometry_7": {
+    "leaves": 618,
+    "adaptive_triangles": 23320,
+    "adaptive_bytes": 328022,
+    "fixed_rows": 866,
+    "fixed_triangles": 23320,
+    "fixed_bytes": 338041
+  },
+  "adaptive_7": {
+    "bpb": 3.076284537578251,
+    "cavity_and_region_completion": 1.0,
+    "nonempty_row": 0.9999581090421632
+  },
+  "fixed_7": {
+    "bpb": 3.104932535105452,
+    "valid": 1.0,
+    "coverage": 0.4289773719009419,
+    "backoff_bpb": 3.519886132777089
+  },
+  "shuffled": {
+    "bpb": 3.326506666166142,
+    "cavity_and_region_completion": 1.0,
+    "nonempty_row": 0.9999581090421632
+  },
+  "passes": false
+}
