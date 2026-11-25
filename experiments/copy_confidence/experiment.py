@@ -66,9 +66,8 @@ def main():
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     train_names = list(BOOKS)[:4]
-    kn = KneserNey(5).fit(
-        [np.frombuffer(book(args.books, n), np.uint8) for n in train_names]
-    )
+    documents = [np.frombuffer(book(args.books, n), np.uint8) for n in train_names]
+    kn = KneserNey(5).fit(documents)
     if args.phase == "calibrate":
         name = "jekyll-43"
         raw = book(args.books, name)
@@ -124,6 +123,20 @@ def main():
         "passes": scores["kn5"] - scores["learned"] >= 0.01
         and scores["learned"] < scores["global"],
     }
+    if args.phase == "test":
+        gain = np.log2(((1 - weights) * base + weights * correct) / base)
+        blocks = [float(block.mean()) for block in np.array_split(gain, 32)]
+        other_orders = {}
+        for order in (6, 7, 8):
+            other = KneserNey(order).fit(documents).prob(data, start=8)
+            other_orders[order] = {
+                "base": loss(other, correct, 0),
+                "learned": loss(other, correct, weights),
+            }
+        report["post_hoc"] = {
+            "gain_by_contiguous_block": blocks,
+            "fixed_gate_other_orders": other_orders,
+        }
     print(json.dumps(report, indent=2))
     (args.out / (args.phase + ".json")).write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8"
