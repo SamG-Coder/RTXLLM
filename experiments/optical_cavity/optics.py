@@ -90,15 +90,16 @@ def cell_ids(points, grid):
     return np.where(ok, xy[:, 0] + grid * xy[:, 1], -1)
 
 
-def write_strips(counts):
+def write_strips(counts, addresses=None):
     # Nonempty byte outcomes partition each row's unit-width detector. Only
     # triangle extents and stable output-byte IDs carry the learned masses.
     rr, token = np.nonzero(counts)
     cdf = counts.cumsum(1)
     total = cdf[rr, -1]
-    left = rr % 128 + (cdf[rr, token] - counts[rr, token]) / total
-    right = rr % 128 + cdf[rr, token] / total
-    y = rr // 128
+    address = rr if addresses is None else addresses[rr]
+    left = address % 128 + (cdf[rr, token] - counts[rr, token]) / total
+    right = address % 128 + cdf[rr, token] / total
+    y = address // 128
     z = np.zeros(len(y))
     corners = np.stack(
         [
@@ -118,7 +119,11 @@ def write_strips(counts):
     )
 
 
-def read_strips(device, kernel, scene_data, row_count):
+def read_strips(device, kernel, scene_data, row_count, addresses=None):
+    if addresses is None:
+        addresses = np.arange(row_count, dtype=np.uint32)
+    if addresses.shape != (row_count,) or np.any(addresses < 0):
+        raise ValueError("Expected one nonnegative physical address per requested row")
     scene = TriangleScene(device, scene_data)
     output = gpu_buffer(
         device, np.empty((row_count, 256), np.int32), sp.BufferUsage.unordered_access
@@ -130,6 +135,7 @@ def read_strips(device, kernel, scene_data, row_count):
             "owners": scene.bindings["owners"],
             "votes": output,
             "rowCount": row_count,
+            "addresses": gpu_buffer(device, addresses.astype(np.uint32)),
         },
     )
     hits = output.to_numpy().view(np.int32).reshape(row_count, 256)
