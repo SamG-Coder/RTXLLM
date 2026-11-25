@@ -193,5 +193,10 @@ class LayeredScene:
         return p
 
 
+def rtx_available():
+    return any(a.vendor_id == 0x10DE and "RTX" in a.name
+               for a in sp.Device.enumerate_adapters(sp.DeviceType.vulkan))
+
+
 def open_backoff_kernel():
     return open_kernel("backoff.slang")

@@ -10,11 +10,11 @@ TEXT = np.frombuffer(b"the cat sat on the mat. \xff\xfe\x80 high \xc3\xa9t\xc3\x
 
 
 def _rtx():
-    sp = pytest.importorskip("slangpy")
-    if not any(a.vendor_id == 0x10DE and "RTX" in a.name for a in sp.Device.enumerate_adapters(sp.DeviceType.vulkan)):
-        pytest.skip("no NVIDIA RTX Vulkan adapter")
+    pytest.importorskip("slangpy")
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src" / "rtx"))
-    import backoff
+    import backoff          # sets the loader workaround before any adapter enumeration
+    if not backoff.rtx_available():
+        pytest.skip("no NVIDIA RTX Vulkan adapter")
     return backoff
 
 
