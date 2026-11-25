@@ -78,23 +78,60 @@ def main():
         t0 = perf_counter()
         scene = LayeredScene(device, load(path))
         load_build_s = perf_counter() - t0
-        pts = scene.points(test, idx)
-        scene.trace(kernel, pts)                                   # warm-up
-        (dishes, gpu_ms), search_s = timed(lambda: scene.trace(kernel, pts))
+        L = ORDER
+        scene.trace(kernel, scene.points(test, idx))               # warm-up
+        # Stage timings (median of 5 each; GPU dispatch ms aggregated the same way).
+        pts, encode_s = timed(lambda: scene.points(test, idx))
+        gpu_series, walls = [], []
+        for _ in range(5):
+            t0 = perf_counter()
+            dishes, ms = scene.trace(kernel, pts)
+            walls.append(perf_counter() - t0)
+            gpu_series.append(ms)
+        gpu_ms, search_s = float(np.median(gpu_series)), float(np.median(walls))
         _, fold_s = timed(lambda: scene.target_prob(dishes, test[idx]))
-        p = scene.target_prob(dishes, test[idx])
+
+        # Directly timed bytes -> probabilities path (encoding + RTX search + payload fold).
+        def end_to_end():
+            d, _ = scene.trace(kernel, scene.points(test, idx))
+            return scene.target_prob(d, test[idx])
+
+        p, e2e_s = timed(end_to_end)
         ref, cpu_kn_s = timed(lambda: kn.prob(test, start=START))
         parity_dishes = bool(np.array_equal(dishes, scene.expected_dishes(test, idx)))
-        _, cpu_index_s = timed(lambda: scene.expected_dishes(test, idx))
+        # CPU suffix index: per-layer sorted keys built once, outside timing (like the GPU AS).
+        lay, key = scene.s["dish_layer"], scene.s["dish_key"]
+        index = []
+        for m in range(scene.k, 0, -1):
+            rows = np.flatnonzero(lay == m)
+            o = np.argsort(key[rows], kind="stable")
+            index.append((m, key[rows][o], rows[o]))
+        data_u = test.astype(np.uint64)
+
+        def cpu_search():
+            out = []
+            for m, sk, rows in index:
+                q = np.zeros(len(idx), np.uint64)
+                for j in range(m, 0, -1):
+                    q = q * np.uint64(256) + data_u[idx - j]
+                i = np.minimum(np.searchsorted(sk, q), len(sk) - 1)
+                out.append(np.where(sk[i] == q, rows[i], -1))
+            return out
+
+        _, cpu_index_s = timed(cpu_search)
+        hits = (dishes >= 0).sum(1)
+        segments = int(np.minimum(hits + 1, L).sum())          # traces per query: hits, plus one miss unless all L layers hit
         row = {"train_bytes": int(sum(len(d) for d in docs)), "fit_s": fit_s, "write_s": write_s,
                "load_and_as_build_s": load_build_s, **scene.metrics,
                "scene_file_bytes": path.stat().st_size,
                "bpb_rtx": float(-np.log2(p).mean()), "bpb_numpy_kn": float(-np.log2(ref).mean()),
                "max_abs_dp": float(np.abs(p - ref).max()), "dish_parity": parity_dishes,
-               "gpu_search_dispatch_ms": gpu_ms, "search_host_wall_s": search_s,
-               "transfer_and_sync_s": search_s - gpu_ms / 1000, "payload_fold_cpu_s": fold_s,
-               "rays_per_s_dispatch": len(idx) / (gpu_ms / 1000),
-               "ray_layer_intersections": int((dishes >= 0).sum()),
+               "encode_s": encode_s, "gpu_search_dispatch_ms": gpu_ms, "gpu_dispatch_ms_series": gpu_series,
+               "search_host_wall_s": search_s, "transfer_and_sync_s": search_s - gpu_ms / 1000,
+               "payload_fold_cpu_s": fold_s, "end_to_end_bytes_to_probs_s": e2e_s,
+               "queries_per_s_dispatch": len(idx) / (gpu_ms / 1000),
+               "ray_segments_traced": segments, "ray_segments_per_s_dispatch": segments / (gpu_ms / 1000),
+               "dish_hits": int(hits.sum()),
                "cpu_sorted_key_suffix_search_s": cpu_index_s, "cpu_numpy_kn_full_s": cpu_kn_s}
         report["sizes"][label] = row
         print(label, json.dumps({k: (round(v, 6) if isinstance(v, float) else v) for k, v in row.items()}), flush=True)

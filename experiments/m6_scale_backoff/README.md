@@ -1,8 +1,9 @@
 # #47 — scaling and profiling the RTX layered-backoff scene (Milestone 6)
 
 Claude. Scene and decoder from #36 (`src/rtx/backoff.py`); KN-6 trained on 1, 2 and 4 pinned books
-(each book a separate document); scored on all 346,818 targets of the pinned War of the Worlds from
-offset 8 (the #38 test book; nothing is selected here). Median of 5 timed repeats after a warm-up.
+(each book a separate document); scored on all **346,826** targets of the pinned War of the Worlds
+from offset 8 (the #38 test book; nothing is selected here). Every timing is the median of 5 repeats
+after a warm-up, with GPU dispatch times aggregated the same way (series in `results.json`).
 
 ```
 python experiments/m6_scale_backoff/run.py BOOK_DIR      # writes results.json
@@ -18,24 +19,32 @@ Parity is exact at every size: RTX dish hits = CPU suffix contexts; RTX bpb = Nu
 | + Pride | 858,870 | 132,729 | 265,458 | 17.5 MB | 6.1 MB | 2.7 MB | 2.401 |
 | + Frankenstein, Dracula | 2,153,264 | 224,834 | 449,668 | 28.9 MB | 10.6 MB | 4.7 MB | **2.130** |
 
-| training | KN fit | scene write | load + AS build | GPU search dispatch | search host wall | CPU payload fold | CPU sorted-key suffix search |
+Build costs: KN fit 0.05 / 0.20 / 0.46 s, scene write 0.33 / 0.82 / 1.46 s, load + AS build
+0.23 / 0.28 / 0.31 s.
+
+**Per-stage timings, all 346,826 targets:**
+
+| training | encode (bytes → ray origins) | GPU search dispatch | search host wall | CPU payload fold | **end to end, bytes → probabilities** | NumPy KN-6, full | CPU suffix search, index prebuilt |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| 1 book | 0.05 s | 0.33 s | 0.23 s | 0.171 ms | 40 ms | 58 ms | 65 ms |
-| 2 books | 0.20 s | 0.82 s | 0.28 s | 0.174 ms | 41 ms | 66 ms | 74 ms |
-| 4 books | 0.46 s | 1.46 s | 0.31 s | 0.180 ms | 43 ms | 67 ms | 79 ms |
+| 1 book | 26 ms | 0.171 ms | 35 ms | 54 ms | **118 ms** | 168 ms | 51 ms |
+| 2 books | 24 ms | 0.175 ms | 37 ms | 59 ms | **124 ms** | 164 ms | 52 ms |
+| 4 books | 24 ms | 0.179 ms | 36 ms | 60 ms | **122 ms** | 171 ms | 49 ms |
+
+Work per dispatch: 2.0M dish hits and 2.01–2.07M ray segments traced (one trace per hit plus one
+terminating miss unless all six layers are hit). That is 1.9–2.0×10⁹ queries/s and about 1.15×10¹⁰
+ray segments/s at dispatch level.
 
 ## Findings
-- **Traversal is not the bottleneck.** One dispatch answers all 346,818 queries (about 2.0M
-  ray–layer intersections) in 0.17–0.18 ms, about 2×10⁹ rays/s. It is nearly flat while the scene
-  grows 3.5× (BVH scaling).
-- **Host transfer/synchronisation dominates search** (~40 ms, >99% of search wall time: per-call
-  buffer creation, upload, sync and readback), and the **CPU payload fold** costs more than the
-  search (58–67 ms).
-- **Honest speed comparison:** the GPU dispatch alone is ~400× faster than a NumPy sorted-key suffix
-  search over the same positions (65–79 ms). End to end with the current host path, RTX search plus
-  CPU fold takes 0.10–0.11 s against 0.16–0.19 s for full NumPy KN scoring (single-threaded NumPy,
-  1.6–1.8× faster). That margin is modest and would shrink against an optimised multi-threaded CPU
-  index, so no general speed advantage is claimed.
+- **Traversal is not the bottleneck.** One dispatch answers all queries in 0.17–0.18 ms, nearly flat
+  while the scene grows 3.5×.
+- **Host costs dominate:** the search wall (~36 ms) is >99% buffer creation, upload, sync and
+  readback; the CPU payload fold (54–60 ms) and the query encoding (24–26 ms) each cost more than
+  traversal.
+- **Honest speed comparison:** the directly timed bytes-to-probabilities path (encoding + RTX search +
+  CPU fold) takes 118–124 ms vs 164–171 ms for single-threaded NumPy KN-6 scoring, i.e. **1.35–1.42×**.
+  Against a CPU suffix search with its index prebuilt (49–52 ms), the dispatch alone is ~290× faster,
+  but the end-to-end path is not. No general speed advantage is claimed: an optimised multi-threaded
+  CPU index would narrow or reverse the margin.
 - Memory grows linearly with distinct contexts; acceleration structures cost 1.8–2.0× the vertex bytes.
-- Next steps (not in this PR): persistent device buffers, and the GPU payload fold from #41, which
-  should remove both host costs.
+- Next steps (not in this PR): persistent device buffers, GPU-side encoding, and the GPU payload fold
+  from #41, which together would remove the host costs measured here.
