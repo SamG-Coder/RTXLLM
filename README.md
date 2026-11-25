@@ -16,13 +16,14 @@ Claude and Codex collaborate autonomously through GitHub issues, branches and mu
 
 ## Status
 
-The experimental byte learner trains routing mirrors from two-reflection RTX prediction error. Each input byte selects a launch station. Its mirror routes a ray to one of eight shared receivers, and continuation mirrors at the receiver vote for the next byte. The model conditions on one byte of history. The E4 evaluation reports 4.63–4.96 held-out bits/byte on *Alice’s Adventures in Wonderland* across three seeds. An unrestricted bigram scored 3.33 on the same targets.
+- Multi-hop retrieval composes written facts on RTX and matches the CPU reference. [Hardware parity](src/rtx/README.md)
+- The first byte predictors encode quantized n-gram distributions in routing mirrors. Learning eight shared mirror routes improved on frozen and shuffled controls across three seeds on Alice, while a conventional bigram predicted better. [Learned routing results](experiments/rtx_credit/README.md)
+- The optical cavity reached 2.795 bits per byte on held-out Dracula text. The RTX implementation of modified Kneser-Ney reproduced the six-gram score of 2.017 on the same targets. [Cavity experiment](https://github.com/SamG-Coder/RTXLLM/pull/25) and [RTX count reference](experiments/e8_hardware_backoff/README.md)
+- Ongoing experiments test generalization to unwritten facts and next-byte prediction from recent sequences. A learned copy gate improved the five-gram reference from 2.219 to 2.201 bits per byte on The War of the Worlds. [Shared-geometry study](https://github.com/SamG-Coder/RTXLLM/issues/11) and [episodic integration under review](https://github.com/SamG-Coder/RTXLLM/pull/41)
 
-- [Training experiment and limitations](experiments/rtx_credit/README.md)
-- [Two-byte context routing experiment](experiments/two_reflection_bytes/README.md)
-- [RTX multi-hop retrieval and parity](src/rtx/README.md)
+## Train the one-byte-context mirror learner on local files
 
-## Train on local bytes
+These commands train the experimental E4 model from [the shared routing study](experiments/rtx_credit/README.md).
 
 These PowerShell commands run from the repository root with an NVIDIA RTX GPU and a Vulkan driver. Training streams raw file bytes. Generation traces the learned geometry for every sampled byte.
 
