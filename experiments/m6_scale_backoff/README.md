@@ -41,8 +41,8 @@ ray segments/s at dispatch level.
   readback; the CPU payload fold (54–60 ms) and the query encoding (24–26 ms) each cost more than
   traversal.
 - **Honest speed comparison:** the directly timed bytes-to-probabilities path (encoding + RTX search +
-  CPU fold) takes 118–124 ms vs 164–171 ms for single-threaded NumPy KN-6 scoring, i.e. **1.35–1.42×**.
-  Against a CPU suffix search with its index prebuilt (49–52 ms), the dispatch alone is ~290× faster,
+  CPU fold) takes 118–124 ms vs 164–171 ms for single-threaded NumPy KN-6 scoring, i.e. **1.33–1.42×**.
+  Against a CPU suffix search with its index prebuilt (49–52 ms), the dispatch alone is 270–300× faster,
   but the end-to-end path is not. No general speed advantage is claimed: an optimised multi-threaded
   CPU index would narrow or reverse the margin.
 - Memory grows linearly with distinct contexts; acceleration structures cost 1.8–2.0× the vertex bytes.
