@@ -104,6 +104,7 @@ class BeamRTX:
         lost = np.zeros(Q, np.float32)
         prog = np.asarray(programs)
         rec, gpu_ms, rays = ([] if record else None), 0.0, 0
+        mhit = np.zeros((Q, L), np.float32)
         w = cpu.weights
         for h in range(L):
             small = (E > 0) & (E < cpu.beam.energy_floor)
@@ -129,13 +130,23 @@ class BeamRTX:
                 eng = E[qs, xs][:, None] * w[None]
                 qq = np.repeat(qs, self.B)
                 lf, ef = lg.reshape(-1), eng.reshape(-1)
+                if np.any(lf < -2):
+                    raise RuntimeError("kernel left unwritten landing slots")
+                met = lf != -1
+                np.add.at(mhit[:, h], qq[met], ef[met])
                 ok = lf >= 0
                 lost += np.bincount(qq[~ok], weights=ef[~ok], minlength=Q).astype(np.float32)
                 np.add.at(newE, (qq[ok], lf[ok]), ef[ok])
             E = newE
-        res = BeamResult(E, lost, rays, np.zeros((Q, L), np.float32), rec)
+        res = BeamResult(E, lost, rays, mhit, rec)
         res.gpu_ms = gpu_ms
         return res
+
+
+def rtx_available():
+    """True when a hardware NVIDIA RTX Vulkan adapter is enumerable."""
+    return any(a.vendor_id == 0x10DE and "RTX" in a.name
+               for a in sp.Device.enumerate_adapters(sp.DeviceType.vulkan))
 
 
 def parity(seed=3, width=1.5, dish=0.15, rays=64, n=200):
@@ -168,6 +179,8 @@ def parity(seed=3, width=1.5, dish=0.15, rays=64, n=200):
         out[name] = {"queries": len(qs), "rays": n_rays, "ray_landing_agreement": agree / max(1, n_rays),
                      "same_beam_sets": bool(same_beams),
                      "max_answer_diff": float(np.abs(c.answer - g.answer).max()),
+                     "max_lost_diff": float(np.abs(c.lost - g.lost).max()),
+                     "max_mirror_hit_diff": float(np.abs(c.mirror_hit_energy - g.mirror_hit_energy).max()),
                      "pred_agreement": float(np.mean(c.predict() == g.predict())),
                      "cpu_s": cpu_s, "gpu_host_s": gpu_s, "gpu_dispatch_ms": g.gpu_ms}
     return out

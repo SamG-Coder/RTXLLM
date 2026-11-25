@@ -52,6 +52,7 @@ void trace(uint3 tid : SV_DispatchThreadID)
     float t;
     if (closest(o, d, reach, 1u << (1 + r), tri, t))
     {
+        result = -2;  // reflected; overwritten if a receiver is reached
         float3 p = o + t * d;
         float3 n = normals[tri];
         float3 dr = d - 2.0 * dot(d, n) * n;

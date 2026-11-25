@@ -61,6 +61,7 @@ class BeamResult:
     rays: int
     mirror_hit_energy: np.ndarray  # f32 [Q, hops] energy that met any mirror per hop
     record: list = None            # per (hop, relation): dict(hop, r, qs, xs, landing [nb, B])
+    # landing codes: station id >= 0; -1 no fact hit (emission miss); -2 fact hit, transport missed
 
     def predict(self, threshold=1e-9):
         tot = self.answer.sum(1)
@@ -160,6 +161,7 @@ class BeamTracer:
                 n = fn[li[hit]]
                 dr = dirs[hit] - 2 * (dirs[hit] * n).sum(1, keepdims=True) * n
                 dr = (dr / np.linalg.norm(dr, axis=1, keepdims=True)).astype(np.float32)
+                landing[hit] = -2
                 q2, e2 = qq[hit], eng[hit]
                 rays += len(p)
                 tmax2 = np.full(len(p), P.transport_range, np.float32)

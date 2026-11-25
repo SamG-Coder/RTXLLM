@@ -75,11 +75,13 @@ def test_rtx_beam_parity():
     import sys
     from pathlib import Path
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src" / "rtx"))
-    try:
-        import beam as rtx_beam
-        out = rtx_beam.parity(seed=3, n=60, rays=32)
-    except RuntimeError as e:  # no RTX adapter
-        pytest.skip(str(e))
+    import beam as rtx_beam
+    if not rtx_beam.rtx_available():
+        pytest.skip("no NVIDIA RTX Vulkan adapter")
+    out = rtx_beam.parity(seed=3, n=60, rays=32)   # execution errors must fail, not skip
     for k in ("heldout_1hop", "two_hop"):
         assert out[k]["ray_landing_agreement"] == 1.0
+        assert out[k]["same_beam_sets"]
         assert out[k]["max_answer_diff"] < 1e-6
+        assert out[k]["max_lost_diff"] < 1e-6
+        assert out[k]["max_mirror_hit_diff"] < 1e-6

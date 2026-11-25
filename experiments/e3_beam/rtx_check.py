@@ -69,6 +69,8 @@ def main():
                             "pred_agreement": float(np.mean(g.predict() == c.predict())),
                             "ray_landing_agreement": agree / max(1, n), "rays": n,
                             "max_answer_diff": float(np.abs(c.answer - g.answer).max()),
+                            "max_lost_diff": float(np.abs(c.lost - g.lost).max()),
+                            "max_mirror_hit_diff": float(np.abs(c.mirror_hit_energy - g.mirror_hit_energy).max()),
                             "cpu_s": cs, "rtx_host_s": gs, "rtx_dispatch_ms": g.gpu_ms}
             report["seeds"].setdefault(seed, {})[name] = row
             print(f"seed{seed} {name}: " + " | ".join(
