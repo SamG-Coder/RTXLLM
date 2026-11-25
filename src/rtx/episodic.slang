@@ -70,6 +70,7 @@ void trace(uint3 tid : SV_DispatchThreadID)
     outcomes[tid.x] = search(t, max(0, t - 256), lastByte);
 }
 
+uint windowSize, pairAddress;
 uint ringCursor;
 uint ringCount;
 
@@ -77,14 +78,14 @@ uint ringCount;
 [numthreads(1, 1, 1)]
 void live()
 {
-    int t = 256 + int(ringCursor);
+    int t = int(windowSize + ringCursor);
     if (ringCount < 8)
     {
-        outcomes[0] = int4(-1, -1, 0, readByte(t - 1));
+        outcomes[0] = int4(-1, -1, 0, readByte(t - 1, pairAddress != 0));
         return;
     }
     int lastByte;
-    int4 hit = search(t, t - int(ringCount), lastByte);
+    int4 hit = search(t, t - int(ringCount), lastByte, pairAddress != 0);
     outcomes[0] = int4(hit.xyz, lastByte);
 }
 
@@ -103,10 +104,10 @@ RWStructuredBuffer<int> suffix;
 void recentBytes(uint3 tid : SV_DispatchThreadID)
 {
     if (tid.x < targets)
-        suffix[tid.x] = readByte(int(256 + ringCursor - targets + tid.x));
+        suffix[tid.x] = readByte(int(windowSize + ringCursor - targets + tid.x), pairAddress != 0);
 }
 
-uint windowSize, pairAddress;
+
 
 [shader("compute")]
 [numthreads(64, 1, 1)]

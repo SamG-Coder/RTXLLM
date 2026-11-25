@@ -11,31 +11,9 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "experiments/integrated"))
 from model import Predictor, book
-from online import TILT
-from run import TriangleScene, dispatch, geometry
+from online import place, search
 
 TREASURE = "0fee2fef1b2ffde22e2c962bd8bc2b75ea1ae9b02b3fe85ef08d44f4cc1bb2de"
-
-
-def place(predictor, raw, paired):
-    column = np.frombuffer(raw, np.uint8).astype(np.int32)
-    if paired:
-        column[1:] += 256 * column[:-1]
-    centers = np.column_stack((column, np.arange(len(raw)), np.zeros(len(raw))))
-    return TriangleScene(predictor.device, geometry(centers, TILT))
-
-
-def search(model, kernel, scene, n, window, paired):
-    return dispatch(
-        model.device,
-        kernel,
-        scene,
-        np.empty((n, 4), np.int32),
-        "outcomes",
-        targets=n,
-        windowSize=window,
-        pairAddress=int(paired),
-    )
 
 
 def oracle(raw, window, paired):
@@ -99,19 +77,19 @@ def main():
         "conditions": {},
     }
     for paired in (False, True):
-        scene = place(model, raw, paired)
+        scene = place(model.device, raw, paired)
         for window in (256, 2048):
             start = perf_counter()
-            hits = search(model, kernel, scene, len(idx), window, paired)
+            hits = search(model.device, kernel, scene, len(idx), window, paired)
             wall = perf_counter() - start
             np.testing.assert_array_equal(hits[:, :3], oracle(raw, window, paired))
             if paired:
                 for cut in (8, 257, 4096):
                     altered = raw[:cut] + bytes(b ^ 255 for b in raw[cut : cut + 512])
                     changed = search(
-                        model,
+                        model.device,
                         kernel,
-                        place(model, altered, True),
+                        place(model.device, altered, True),
                         len(altered) - 8,
                         window,
                         True,

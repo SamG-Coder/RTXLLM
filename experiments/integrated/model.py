@@ -15,8 +15,15 @@ ROOT = Path(__file__).resolve().parents[2]
 for directory in (ROOT / "src", ROOT / "src/rtx", ROOT / "experiments/episodic"):
     sys.path.insert(0, str(directory))
 from backoff import LayeredScene, write_scene
-from online import EpisodicRing, empty_ring, scene_from_vertices
-from run import BOOKS, TriangleScene, book, dispatch, gpu_buffer, open_kernel, trace
+from online import (
+    EpisodicRing,
+    capacity,
+    empty_ring,
+    place,
+    scene_from_vertices,
+    search,
+)
+from run import BOOKS, TriangleScene, book, dispatch, gpu_buffer, open_kernel
 
 from rtxllm.baselines.ngram import KneserNey
 
@@ -59,6 +66,7 @@ class Predictor:
         self.gate = TriangleScene(self.device, scene_from_vertices(gate))
         self.suffix_kernel = self.kernel("backoff.slang", "trace")
         self.decoder = self.kernel("copy_confidence.slang", "decode")
+        self.indexed = self.kernel("episodic.slang", "indexedTrace")
         self.recent = self.kernel("episodic.slang", "recentBytes")
         self.payload = {
             label: gpu_buffer(self.device, scene[key].astype(dtype))
@@ -94,16 +102,24 @@ class Predictor:
             raise RuntimeError("Invalid scene readout")
         return p.astype(np.float64)
 
-    def score(self, raw, chunk=32768):
+    def score(self, raw, chunk=32768, paired=False):
         if len(raw) <= 8:
             raise ValueError("Scoring needs at least nine bytes")
         scores = []
         for start in range(8, len(raw), chunk):
-            low = max(0, start - 256)
+            low = max(0, start - capacity(paired))
             block = raw[low : start + chunk]
             idx = np.arange(start - low, len(block))
             data = np.frombuffer(block, np.uint8)
-            episodic, _ = trace(self.device, self.episode_kernel, block)
+            scene = place(self.device, block, paired)
+            episodic = search(
+                self.device,
+                self.indexed,
+                scene,
+                len(block) - 8,
+                capacity(paired),
+                paired,
+            )
             dishes, _ = self.layered.trace(
                 self.suffix_kernel, self.layered.points(data, idx)
             )
@@ -124,6 +140,8 @@ class Predictor:
                 "suffix",
                 targets=n,
                 ringCursor=ring.cursor,
+                windowSize=ring.window,
+                pairAddress=int(ring.paired),
             )
             if np.any((recent < 0) | (recent > 255)):
                 raise RuntimeError("Missing recent byte")
@@ -167,6 +185,12 @@ def main():
     src.add_argument("--resume", type=Path)
     sampler.add_argument("--count", type=int, default=64)
     sampler.add_argument("--seed", type=int)
+    for command in (scorer, sampler):
+        command.add_argument(
+            "--layout",
+            choices=("single", "pair"),
+            help="single uses 256 bytes; pair uses 2048",
+        )
     args = parser.parse_args()
     if args.action == "build":
         docs = (
@@ -180,7 +204,7 @@ def main():
     if args.action == "score":
         raw = args.stream.read_bytes()
         start = perf_counter()
-        p = model.score(raw)
+        p = model.score(raw, paired=args.layout == "pair")
         print(
             json.dumps(
                 {
@@ -196,14 +220,25 @@ def main():
     rng = np.random.default_rng(args.seed if args.seed is not None else 0)
     if args.resume:
         with np.load(args.resume, allow_pickle=False) as saved:
-            if str(saved["model"]) != model.identity or int(saved["version"]) != 1:
+            version = int(saved["version"])
+            if str(saved["model"]) != model.identity or version not in (1, 2):
                 raise ValueError("Incompatible session or model")
+            layout = "single" if version == 1 else str(saved["layout"])
+            if layout not in ("single", "pair") or (
+                args.layout and args.layout != layout
+            ):
+                raise ValueError("Session layout mismatch")
             ring = EpisodicRing(
-                model.device, saved["ring"], int(saved["cursor"]), int(saved["count"])
+                model.device,
+                saved["ring"],
+                int(saved["cursor"]),
+                int(saved["count"]),
+                paired=(layout == "pair"),
             )
             rng.bit_generator.state = json.loads(str(saved["rng"]))
     else:
-        ring = EpisodicRing(model.device, empty_ring(), 0, 0)
+        paired = args.layout == "pair"
+        ring = EpisodicRing(model.device, empty_ring(paired), 0, 0, paired=paired)
         with args.prompt.open("rb") as prompt:
             while chunk := prompt.read(65536):
                 for byte in chunk:
@@ -219,7 +254,8 @@ def main():
     elapsed = perf_counter() - start
     publish(
         args.output_state,
-        version=1,
+        version=2,
+        layout="pair" if ring.paired else "single",
         model=model.identity,
         ring=ring.vertices,
         cursor=ring.cursor,

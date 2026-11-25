@@ -26,21 +26,50 @@ def scene_from_vertices(vertices):
     return mesh(vertices, zeros, zeros, np.array([[1, 0, 0]]))
 
 
-def empty_ring():
-    rows = np.arange(2 * WINDOW)
-    centers = np.column_stack((np.full(len(rows), 300), rows, np.zeros(len(rows))))
+def capacity(paired):
+    return 2048 if paired else WINDOW
+
+
+def empty_ring(paired=False):
+    rows = np.arange(2 * capacity(paired))
+    centers = np.column_stack(
+        (np.full(len(rows), 65537 if paired else 300), rows, np.zeros(len(rows)))
+    )
     return geometry(centers, TILT)["tri_vertices"]
 
 
+def place(device, raw, paired):
+    column = np.frombuffer(raw, np.uint8).astype(np.int32)
+    if paired:
+        column[1:] += 256 * column[:-1]
+    centers = np.column_stack((column, np.arange(len(raw)), np.zeros(len(raw))))
+    return TriangleScene(device, geometry(centers, TILT))
+
+
+def search(device, kernel, scene, n, window, paired):
+    return dispatch(
+        device,
+        kernel,
+        scene,
+        np.empty((n, 4), np.int32),
+        "outcomes",
+        targets=n,
+        windowSize=window,
+        pairAddress=int(paired),
+    )
+
+
 class EpisodicRing:
-    def __init__(self, device, ring_vertices, cursor, count):
+    def __init__(self, device, ring_vertices, cursor, count, paired=False):
+        self.paired = paired
+        self.window = capacity(paired)
         if not (
-            0 <= cursor < WINDOW
-            and 0 <= count <= WINDOW
-            and (count == WINDOW or cursor == count)
+            0 <= cursor < self.window
+            and 0 <= count <= self.window
+            and (count == self.window or cursor == count)
         ):
             raise ValueError("Invalid ring cursor or count")
-        if ring_vertices.shape != (512, 3, 3):
+        if ring_vertices.shape != (2 * self.window, 3, 3):
             raise ValueError("Unexpected ring geometry dimensions")
         self.device = device
         self.vertices = ring_vertices
@@ -53,11 +82,16 @@ class EpisodicRing:
     def observe(self, byte):
         if not 0 <= byte < 256:
             raise ValueError("Expected a byte")
-        for row in (self.cursor, self.cursor + WINDOW):
-            self.vertices[row] = np.array([byte, row, 0], np.float32) + TILT
+        column = int(byte)
+        if self.paired and self.count:
+            # The third vertex is centered in x; the preceding byte is the low digit.
+            previous = int(self.vertices[(self.cursor - 1) % self.window, 2, 0]) & 255
+            column += previous * 256
+        for row in (self.cursor, self.cursor + self.window):
+            self.vertices[row] = np.array([column, row, 0], np.float32) + TILT
         self.scene.refit_vertices(self.vertices)
-        self.cursor = (self.cursor + 1) % WINDOW
-        self.count = min(self.count + 1, WINDOW)
+        self.cursor = (self.cursor + 1) % self.window
+        self.count = min(self.count + 1, self.window)
 
     def query(self):
         if not self.count:
@@ -70,6 +104,8 @@ class EpisodicRing:
             "outcomes",
             ringCursor=self.cursor,
             ringCount=self.count,
+            windowSize=self.window,
+            pairAddress=int(self.paired),
         )[0]
 
 
