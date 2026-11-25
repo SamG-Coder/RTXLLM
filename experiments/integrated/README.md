@@ -4,7 +4,19 @@ The model archive contains the long-term context surfaces and their sparse next-
 
 For each live prediction the GPU reads the recent bytes from ring geometry. They determine the launch position for the long-term suffix search. Rays in the ring find the longest previous match and its successor. A GPU kernel folds emissions and transmission from the suffix surfaces hit by RTX, measures the selected gate triangle, and emits the 256 next-byte probabilities. Python sequences the dispatches, reads intermediate hits, samples a byte with NumPy and refits the ring. Short prompts start the suffix ray at the deepest layer their history supports. Long-term model fitting uses modified Kneser–Ney; episodic retrieval and learned copy confidence are the additions tested in E9.
 
-## Run
+## Fit from your own files
+
+Use independent training and calibration documents. Training writes the long-term surfaces. Calibration reloads the surfaces on RTX, traces prior occurrences within each calibration document, scores the possible copy weights for each match length, and writes the selected weights as triangle heights in the same archive. Calibration resets between files and excludes the first eight bytes of each. A short file contributes zero targets. Use a third document for an independent evaluation.
+
+~~~sh
+python experiments/integrated/model.py fit local.npz --documents train-a.bin train-b.bin --calibration valid-a.bin valid-b.bin --layout pair --order 6
+python experiments/integrated/model.py score local.npz test.bin
+python experiments/integrated/model.py generate local.npz live.npz --prompt prompt.bin --count 128
+~~~
+
+The model remembers the layout used during calibration. The example uses two-byte addressing and 2,048 bytes of recent memory. Loading an older archive defaults to the original single-byte layout. Long-term count fitting and selection among candidate weights run on the host; all long-term training probabilities used for calibration are read from RTX-selected surfaces with the GPU payload decoder. Reported calibration loss measures the fitting set. Single-byte E9 local fitting reproduced all seven frozen nonzero weights and 2.09503606 bits per byte on Jekyll.
+
+## Build from an existing gate
 
 With the repository SlangPy environment on RTX, calibrate the gate once as in experiments/copy_confidence/README.md. Train a long-term scene from independent raw files or use the four pinned E9 books. Use a new output filename for each model and session. The checkpoint writer uses hard links.
 

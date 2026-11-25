@@ -40,12 +40,18 @@ def build(output, documents, gate_path, order=5):
         vertices = gate["tri_vertices"]
     if vertices.shape != (9, 3, 3):
         raise ValueError("Expected nine gate triangles")
+    publish(
+        output, gate_vertices=vertices, version=1, **fit_long_term(documents, order)
+    )
+
+
+def fit_long_term(documents, order):
     arrays = [np.frombuffer(raw, np.uint8) for raw in documents]
     longest = max(map(len, arrays), default=0)
     if longest == 0:
         raise ValueError("Training requires at least one byte")
     kn = KneserNey(min(order, longest)).fit(arrays)
-    publish(output, gate_vertices=vertices, version=1, **write_scene(kn))
+    return write_scene(kn)
 
 
 class Predictor:
@@ -54,10 +60,13 @@ class Predictor:
             if int(saved["version"]) != 1:
                 raise ValueError("Unknown model version")
             gate = saved["gate_vertices"]
+            self.layout = str(saved["layout"]) if "layout" in saved else "single"
+            if self.layout not in ("single", "pair"):
+                raise ValueError("Unknown model layout")
             scene = {
                 k: saved[k]
                 for k in saved.files
-                if k not in ("gate_vertices", "version")
+                if k not in ("gate_vertices", "version", "layout")
             }
         with path.open("rb") as f:
             self.identity = hashlib.file_digest(f, "sha256").hexdigest()
@@ -102,10 +111,11 @@ class Predictor:
             raise RuntimeError("Invalid scene readout")
         return p.astype(np.float64)
 
-    def score(self, raw, chunk=32768, paired=False):
+    def blocks(self, raw, chunk=32768, paired=None):
+        if paired is None:
+            paired = self.layout == "pair"
         if len(raw) <= 8:
             raise ValueError("Scoring needs at least nine bytes")
-        scores = []
         for start in range(8, len(raw), chunk):
             low = max(0, start - capacity(paired))
             block = raw[low : start + chunk]
@@ -123,8 +133,12 @@ class Predictor:
             dishes, _ = self.layered.trace(
                 self.suffix_kernel, self.layered.points(data, idx)
             )
-            scores.append(self.decode(dishes, episodic[idx - 8], data[idx]))
-        return np.concatenate(scores)
+            yield dishes, episodic[idx - 8], data[idx]
+
+    def score(self, raw, chunk=32768, paired=None):
+        return np.concatenate(
+            [self.decode(*block) for block in self.blocks(raw, chunk, paired)]
+        )
 
     def distribution(self, ring):
         episode = ring.query()[None, :]
@@ -157,6 +171,15 @@ class Predictor:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     cmds = parser.add_subparsers(dest="action", required=True)
+    fitter = cmds.add_parser(
+        "fit",
+        help="Train the long-term scene and calibrate its copy gates on local documents",
+    )
+    fitter.add_argument("model", type=Path)
+    fitter.add_argument("--documents", type=Path, nargs="+", required=True)
+    fitter.add_argument("--calibration", type=Path, nargs="+", required=True)
+    fitter.add_argument("--order", type=int, choices=range(1, 7), default=5)
+    fitter.add_argument("--layout", choices=("single", "pair"), default="single")
     writer = cmds.add_parser("build")
     writer.add_argument("gate", type=Path)
     writer.add_argument("model", type=Path)
@@ -192,6 +215,25 @@ def main():
             help="single uses 256 bytes; pair uses 2048",
         )
     args = parser.parse_args()
+    if args.action == "fit":
+        from local_training import fit_local
+
+        if {p.resolve() for p in args.documents} & {
+            p.resolve() for p in args.calibration
+        }:
+            parser.error("Supply disjoint training and calibration files")
+        print(
+            json.dumps(
+                fit_local(
+                    args.model,
+                    args.documents,
+                    args.calibration,
+                    args.order,
+                    args.layout,
+                )
+            )
+        )
+        return
     if args.action == "build":
         docs = (
             (p.read_bytes() for p in args.documents)
@@ -204,7 +246,7 @@ def main():
     if args.action == "score":
         raw = args.stream.read_bytes()
         start = perf_counter()
-        p = model.score(raw, paired=args.layout == "pair")
+        p = model.score(raw, paired=(args.layout or model.layout) == "pair")
         print(
             json.dumps(
                 {
@@ -237,7 +279,7 @@ def main():
             )
             rng.bit_generator.state = json.loads(str(saved["rng"]))
     else:
-        paired = args.layout == "pair"
+        paired = (args.layout or model.layout) == "pair"
         ring = EpisodicRing(model.device, empty_ring(paired), 0, 0, paired=paired)
         with args.prompt.open("rb") as prompt:
             while chunk := prompt.read(65536):
