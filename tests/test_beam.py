@@ -111,3 +111,17 @@ def test_broadphase_respects_pair_budget_exactly(world, budget, rays, monkeypatc
     assert max(sizes) <= budget                  # every Moller-Trumbore call, emission and receiver
     if budget == 7:
         assert rays + 1 > budget                 # covers the case B exceeds the budget
+
+
+def test_annular_beam_never_hits_own_dish(world):
+    """E3b leave-one-out: an annulus with inner radius > dish radius cannot hit the
+    station's own dish (the core slot carries zero energy)."""
+    from rtxllm.core.scene import KIND_FACT
+    geom = GeometryConfig(receiver_radius=0.075, fact_radius=0.05, dish_radius=0.3)
+    scene = build_scene(world, geom)
+    bt = BeamTracer(scene, BeamParams(width=2.0, core=0.0, inner=0.4, rays=64, fact_distance=geom.fact_distance))
+    assert np.all(np.linalg.norm(bt.offsets[1:], axis=1) > 0.4 - 1e-9)
+    assert bt.weights[0] == 0.0 and abs(bt.weights.sum() - 1) < 1e-6
+    keys = sorted(world.written)[:40]
+    r = bt.trace([s for s, _ in keys], [(x,) for _, x in keys], record=True)
+    assert np.allclose(r.answer.sum(1) + r.lost, 1.0, atol=1e-5)

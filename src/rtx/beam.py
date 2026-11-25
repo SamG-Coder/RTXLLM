@@ -80,17 +80,26 @@ class BeamRTX:
             "tMin": float(sc.params.t_min),
         }
 
-    def dispatch(self, stations, relations):
+    def dispatch(self, stations, relations, with_hits=False):
+        """One ray per (beam, offset). Returns landing codes [nb, B] and GPU ms; with
+        ``with_hits`` also the original-scene index of each emission hit (-1 none)."""
         nb = len(stations)
         out = gpu_buffer(self.device, np.full(nb * self.B, -2, np.int32), sp.BufferUsage.unordered_access)
+        hits = gpu_buffer(self.device, np.full(nb * self.B, -1, np.int32), sp.BufferUsage.unordered_access)
         pool = self.device.create_query_pool(sp.QueryType.timestamp, 2)
         self.kernel.dispatch(thread_count=[nb * self.B, 1, 1], vars=dict(
             self.bind, beamStation=gpu_buffer(self.device, stations.astype(np.int32)),
-            beamRelation=gpu_buffer(self.device, relations.astype(np.int32)), landing=out, beamCount=nb),
-            query_pool=pool, query_index_before=0, query_index_after=1)
+            beamRelation=gpu_buffer(self.device, relations.astype(np.int32)), landing=out, hitTri=hits,
+            beamCount=nb), query_pool=pool, query_index_before=0, query_index_after=1)
         self.device.wait_for_idle()
         a, b = pool.get_results(0, 2)
-        return out.to_numpy().view(np.int32).reshape(nb, self.B), (b - a) * 1000 / self.device.info.timestamp_frequency
+        land = out.to_numpy().view(np.int32).reshape(nb, self.B)
+        ms = (b - a) * 1000 / self.device.info.timestamp_frequency
+        if not with_hits:
+            return land, ms
+        h = hits.to_numpy().view(np.int32).reshape(nb, self.B)
+        orig = np.where(h >= 0, self.order[np.maximum(h, 0)], -1)
+        return land, ms, orig
 
     def trace(self, starts, programs, record=False):
         """Same hop-synchronous semantics and energy bookkeeping as BeamTracer.trace."""
